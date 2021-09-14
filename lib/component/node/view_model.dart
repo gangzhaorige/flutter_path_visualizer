@@ -9,6 +9,7 @@ class NodeModel extends BaseViewModel {
     this.start,
     this.end,
     this.visited = false,
+    this.isWall = false,
   });
 
   int row;
@@ -16,14 +17,25 @@ class NodeModel extends BaseViewModel {
   bool start;
   bool end;
   bool visited;
+  bool isWall;
 
   void visit() {
     visited = true;
   }
 
   void updatePath(int index) {
-    Future.delayed(Duration(milliseconds: index * 15)).then((_) {
+    Future.delayed(Duration(milliseconds: index * 10)).then((_) {
       notifyListeners();
     });
+  }
+
+  void toggleWall() {
+    isWall = !isWall;
+    notifyListeners();
+  }
+
+  void unVisit() {
+    visited = false;
+    notifyListeners();
   }
 }

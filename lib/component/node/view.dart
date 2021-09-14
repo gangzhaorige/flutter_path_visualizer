@@ -18,7 +18,9 @@ class Node extends ViewModelWidget<NodeModel> {
         height: 30,
         width: 30,
         color: (() {
-          if (viewModel.visited) {
+          if (viewModel.isWall) {
+            return Colors.yellow;
+          } else if (viewModel.visited) {
             return Colors.green;
           } else if (viewModel.end) {
             return Colors.blue;
@@ -28,6 +30,10 @@ class Node extends ViewModelWidget<NodeModel> {
           return Colors.black;
         }()),
       ),
+      onTap: () {
+        viewModel.toggleWall();
+        print('clicked');
+      },
     );
   }
 }

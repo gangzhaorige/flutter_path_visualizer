@@ -117,20 +117,22 @@ class HomeView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   MaterialButton(
-                    onPressed: () async {
-                      viewModel.updateUI(await viewModel.bfs());
+                    onPressed: () {
+                      viewModel.updateUI(viewModel.bfs());
                     },
+                    color: Colors.blueAccent,
+                    disabledColor: Colors.red,
                     child: Container(
                       height: 100,
                       width: 100,
-                      color: Colors.blueAccent,
                       child: Text('BFS'),
                       alignment: Alignment.center,
                     ),
                   ),
                   MaterialButton(
-                    onPressed: () async {
-                      viewModel.updateUI(await viewModel.dfs());
+                    onPressed: () {
+                      List<NodeModel> nodes = viewModel.dfs();
+                      viewModel.updateUI(nodes);
                     },
                     color: Colors.blueAccent,
                     disabledColor: Colors.red,
@@ -143,12 +145,13 @@ class HomeView extends StatelessWidget {
                   ),
                   MaterialButton(
                     onPressed: () {
-                      viewModel.generateGrid();
+                      viewModel.resetGrid();
                     },
+                    color: Colors.blueAccent,
+                    disabledColor: Colors.red,
                     child: Container(
                       height: 100,
                       width: 100,
-                      color: Colors.blueAccent,
                       child: Text('RESET'),
                       alignment: Alignment.center,
                     ),
@@ -194,15 +197,15 @@ class HomeViewModel extends BaseViewModel {
             start: isStart,
             end: isEnd,
             visited: false,
+            isWall: false,
           ),
         );
       }
       grid.add(row);
     }
-    notifyListeners();
   }
 
-  Future<List<NodeModel>> bfs() {
+  List<NodeModel> bfs() {
     List<NodeModel> list = [];
     Queue<NodeModel> queue = Queue();
     queue.add(grid[startRow][startCol]);
@@ -216,23 +219,23 @@ class HomeViewModel extends BaseViewModel {
         node.visit();
         list.add(node);
         if (node.row == endRow && node.col == endCol) {
-          return Future.value(list);
+          return list;
         }
         List<NodeModel> neighbors = getNeighbors(node.row, node.col);
         for (NodeModel model in neighbors) {
-          if (!model.visited) {
+          if (!model.visited && !model.isWall) {
             queue.add(model);
           }
         }
       }
     }
-    return Future.value(list);
+    return list;
   }
 
-  Future<List<NodeModel>> dfs() {
+  List<NodeModel> dfs() {
     List<NodeModel> list = [];
     dfsHelper(list, grid[startRow][startCol]);
-    return Future.value(list);
+    return list;
   }
 
   void dfsHelper(List<NodeModel> list, NodeModel node) {
@@ -247,7 +250,7 @@ class HomeViewModel extends BaseViewModel {
     for (List<int> direction in directions) {
       int curRow = node.row + direction[0];
       int curCol = node.col + direction[1];
-      if (!isOutOfBoard(curRow, curCol) && !grid[curRow][curCol].visited) {
+      if (!isOutOfBoard(curRow, curCol) && !grid[curRow][curCol].visited && !grid[curRow][curCol].isWall) {
         dfsHelper(list, grid[curRow][curCol]);
       }
     }
@@ -273,9 +276,18 @@ class HomeViewModel extends BaseViewModel {
     return false;
   }
 
-  Future<void> updateUI(List<NodeModel> list) async {
+  void updateUI(List<NodeModel> list) async {
     for (int i = 0; i < list.length; i++) {
       list[i].updatePath(i);
     }
+  }
+
+  void resetGrid() {
+    for (List<NodeModel> row in grid) {
+      for (NodeModel node in row) {
+        node.unVisit();
+      }
+    }
+    notifyListeners();
   }
 }
