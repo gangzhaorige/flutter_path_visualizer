@@ -32,21 +32,11 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-// View
-class HomeView extends StatefulWidget {
-  @override
-  State<HomeView> createState() => HomeViewState();
-}
-
-class HomeViewState extends State<HomeView> {
-
-  bool isUpdating = false;
-
+class HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     // Using the reactive constructor gives you the traditional ViewModel
     // binding which will execute the builder again when notifyListeners is called.
-    return ViewModelBuilder<HomeViewModel>.nonReactive(
+    return ViewModelBuilder<HomeViewModel>.reactive(
       onModelReady: (viewModel) => viewModel.generateGrid(),
       viewModelBuilder: () => HomeViewModel(),
       builder: (context, viewModel, child) => Scaffold(
@@ -122,19 +112,13 @@ class HomeViewState extends State<HomeView> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   MaterialButton(
-                    onPressed: isUpdating ? null : () async {
-                      setState(() {
-                        isUpdating = true;
-                      });
+                    onPressed: !viewModel.isUpdating ? null : () async {
+                      viewModel.change();
                       List<NodeModel> nodes = viewModel.bfs();
                       int timer = await viewModel.updateUI(nodes);
                       print(timer);
                       Future.delayed(Duration(milliseconds: timer)).then((value) {
-                        print('WHat');
-                        setState(() {
-                          isUpdating = false;
-                          print('NANI');
-                        });
+                        viewModel.change();
                       });
                     },
                     color: Colors.blueAccent,
@@ -147,9 +131,13 @@ class HomeViewState extends State<HomeView> {
                     ),
                   ),
                   MaterialButton(
-                    onPressed: () {
+                    onPressed: !viewModel.isUpdating ? null :() async {
+                      viewModel.change();
                       List<NodeModel> nodes = viewModel.dfs();
-                      viewModel.updateUI(nodes);
+                      int timer = await viewModel.updateUI(nodes);
+                      Future.delayed(Duration(milliseconds: timer)).then((value) {
+                        viewModel.change();
+                      });
                     },
                     color: Colors.blueAccent,
                     disabledColor: Colors.red,
@@ -161,8 +149,8 @@ class HomeViewState extends State<HomeView> {
                     ),
                   ),
                   MaterialButton(
-                    onPressed: () {
-                      viewModel.resetGrid();
+                    onPressed: !viewModel.isUpdating ? null : () {
+                      viewModel.generateGrid();
                     },
                     color: Colors.blueAccent,
                     disabledColor: Colors.red,
@@ -185,13 +173,14 @@ class HomeViewState extends State<HomeView> {
 }
 
 // ViewModel
-class HomeViewModel extends BaseViewModel {
+class HomeViewModel extends ChangeNotifier {
   int maxRow = 50;
   int maxCol = 30;
   int startRow = 49;
   int startCol = 29;
   int endRow = 0;
   int endCol = 0;
+  bool isUpdating = true;
 
   List<List<NodeModel>> grid = [];
 
@@ -353,5 +342,10 @@ class HomeViewModel extends BaseViewModel {
       cur = cur.previousNode;
     }
     return queue;
+  }
+
+  void change() {
+    isUpdating = !isUpdating;
+    notifyListeners();
   }
 }
