@@ -34,12 +34,19 @@ class MyApp extends StatelessWidget {
 }
 
 // View
-class HomeView extends StatelessWidget {
+class HomeView extends StatefulWidget {
   @override
+  State<HomeView> createState() => HomeViewState();
+}
+
+class HomeViewState extends State<HomeView> {
+
+  bool isUpdating = false;
+
   Widget build(BuildContext context) {
     // Using the reactive constructor gives you the traditional ViewModel
     // binding which will execute the builder again when notifyListeners is called.
-    return ViewModelBuilder<HomeViewModel>.reactive(
+    return ViewModelBuilder<HomeViewModel>.nonReactive(
       onModelReady: (viewModel) => viewModel.generateGrid(),
       viewModelBuilder: () => HomeViewModel(),
       builder: (context, viewModel, child) => Scaffold(
@@ -99,9 +106,7 @@ class HomeView extends StatelessWidget {
                   for (int row = 0; row < viewModel.grid.length; row++) ...[
                     Column(
                       children: [
-                        for (int col = 0;
-                            col < viewModel.grid[0].length;
-                            col++) ...[
+                        for (int col = 0; col < viewModel.grid[0].length; col++) ...[
                           ChangeNotifierProvider.value(
                             value: viewModel.grid[row][col],
                             child: Node(),
@@ -117,8 +122,20 @@ class HomeView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   MaterialButton(
-                    onPressed: () {
-                      viewModel.updateUI(viewModel.bfs());
+                    onPressed: isUpdating ? null : () async {
+                      setState(() {
+                        isUpdating = true;
+                      });
+                      List<NodeModel> nodes = viewModel.bfs();
+                      int timer = await viewModel.updateUI(nodes);
+                      print(timer);
+                      Future.delayed(Duration(milliseconds: timer)).then((value) {
+                        print('WHat');
+                        setState(() {
+                          isUpdating = false;
+                          print('NANI');
+                        });
+                      });
                     },
                     color: Colors.blueAccent,
                     disabledColor: Colors.red,
@@ -155,7 +172,7 @@ class HomeView extends StatelessWidget {
                       child: Text('RESET'),
                       alignment: Alignment.center,
                     ),
-                  )
+                  ),
                 ],
               ),
             ],
@@ -164,18 +181,20 @@ class HomeView extends StatelessWidget {
       ),
     );
   }
+
 }
 
 // ViewModel
 class HomeViewModel extends BaseViewModel {
   int maxRow = 50;
   int maxCol = 30;
-  int startRow = 20;
-  int startCol = 15;
-  int endRow = 6;
-  int endCol = 6;
+  int startRow = 49;
+  int startCol = 29;
+  int endRow = 0;
+  int endCol = 0;
 
-  List<List<NodeModel>> grid;
+  List<List<NodeModel>> grid = [];
+
   List<List<int>> directions = [
     [1, 0],
     [0, -1],
@@ -184,7 +203,7 @@ class HomeViewModel extends BaseViewModel {
   ];
 
   void generateGrid() {
-    grid = [];
+    grid.clear();
     for (int i = 0; i < maxRow; i++) {
       List<NodeModel> row = [];
       for (int j = 0; j < maxCol; j++) {
@@ -198,11 +217,21 @@ class HomeViewModel extends BaseViewModel {
             end: isEnd,
             visited: false,
             isWall: false,
+            color: () {
+              if (isStart) {
+                return Colors.blue;
+              } else if (isEnd) {
+                return Colors.red;
+              } else {
+                return Colors.black;
+              }
+            } ()
           ),
         );
       }
       grid.add(row);
     }
+    notifyListeners();
   }
 
   List<NodeModel> bfs() {
@@ -224,6 +253,7 @@ class HomeViewModel extends BaseViewModel {
         List<NodeModel> neighbors = getNeighbors(node.row, node.col);
         for (NodeModel model in neighbors) {
           if (!model.visited && !model.isWall) {
+            model.previousNode = node;
             queue.add(model);
           }
         }
@@ -251,7 +281,9 @@ class HomeViewModel extends BaseViewModel {
       int curRow = node.row + direction[0];
       int curCol = node.col + direction[1];
       if (!isOutOfBoard(curRow, curCol) && !grid[curRow][curCol].visited && !grid[curRow][curCol].isWall) {
-        dfsHelper(list, grid[curRow][curCol]);
+        NodeModel next = grid[curRow][curCol];
+        next.previousNode = node;
+        dfsHelper(list, next);
       }
     }
     return;
@@ -276,9 +308,30 @@ class HomeViewModel extends BaseViewModel {
     return false;
   }
 
-  void updateUI(List<NodeModel> list) async {
-    for (int i = 0; i < list.length; i++) {
-      list[i].updatePath(i);
+  Future<int> updateUI(List<NodeModel> visitedNodeInOrder) async {
+    Queue<NodeModel> shortestPathOrder = getNodesInShortestPathOrder(grid[endRow][endCol]);
+    for (int i = 0; i <= visitedNodeInOrder.length; i++) {
+      if(i == visitedNodeInOrder.length) {
+        Future.delayed(Duration(milliseconds: 10 * i)).then((value) {
+          animateShortestPath(shortestPathOrder);
+        });
+        return Future.value(visitedNodeInOrder.length * 10 + shortestPathOrder.length * 10);
+      }
+      Future.delayed(Duration(milliseconds: 10 * i)).then((value) {
+        visitedNodeInOrder[i].updateVisited();
+      });
+    }
+    return Future.value(visitedNodeInOrder.length * 10);
+  }
+
+  void animateShortestPath(Queue<NodeModel> shortestPathOrder) {
+    int i= 0;
+    while(shortestPathOrder.isNotEmpty) {
+      NodeModel cur = shortestPathOrder.removeFirst();
+      Future.delayed(Duration(milliseconds: 10 * i)).then((value) {
+        cur.updatePath();
+      });
+      i++;
     }
   }
 
@@ -286,8 +339,19 @@ class HomeViewModel extends BaseViewModel {
     for (List<NodeModel> row in grid) {
       for (NodeModel node in row) {
         node.unVisit();
+        node.resetColor();
       }
     }
     notifyListeners();
+  }
+
+  Queue<NodeModel> getNodesInShortestPathOrder(NodeModel endNode) {
+    Queue<NodeModel> queue = new Queue();
+    NodeModel cur = endNode;
+    while(cur != null) {
+      queue.addFirst(cur);
+      cur = cur.previousNode;
+    }
+    return queue;
   }
 }

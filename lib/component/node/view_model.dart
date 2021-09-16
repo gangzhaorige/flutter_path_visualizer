@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:stacked/stacked.dart';
 
@@ -10,6 +13,8 @@ class NodeModel extends BaseViewModel {
     this.end,
     this.visited = false,
     this.isWall = false,
+    this.previousNode = null,
+    this.color = Colors.black,
   });
 
   int row;
@@ -18,24 +23,43 @@ class NodeModel extends BaseViewModel {
   bool end;
   bool visited;
   bool isWall;
+  Color color;
+  NodeModel previousNode;
 
   void visit() {
     visited = true;
+    if(!start && !end) {
+      color = Colors.green;
+    }
   }
 
-  void updatePath(int index) {
-    Future.delayed(Duration(milliseconds: index * 10)).then((_) {
+  updateVisited() {
+    notifyListeners();
+  }
+
+  updatePath() {
+    if (!start && !end) {
+      color = Colors.pink;
       notifyListeners();
-    });
+    }
   }
 
   void toggleWall() {
-    isWall = !isWall;
-    notifyListeners();
+    if(!start && !end) {
+      color = !isWall ? Colors.yellow : Colors.black;
+      isWall = !isWall;
+      notifyListeners(); 
+    }
   }
 
   void unVisit() {
     visited = false;
+  }
+
+  void resetColor() {
+    if(!start && !end && !isWall && color != Colors.black) {
+      color = Colors.black;
+    }
     notifyListeners();
   }
 }

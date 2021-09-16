@@ -12,27 +12,16 @@ class Node extends ViewModelWidget<NodeModel> {
   @override
   Widget build(BuildContext context, NodeModel viewModel) {
     return GestureDetector(
-      child: Container(
+      child: AnimatedContainer(
         alignment: Alignment.center,
         margin: EdgeInsets.all(1),
         height: 30,
         width: 30,
-        color: (() {
-          if (viewModel.isWall) {
-            return Colors.yellow;
-          } else if (viewModel.visited) {
-            return Colors.green;
-          } else if (viewModel.end) {
-            return Colors.blue;
-          } else if (viewModel.start) {
-            return Colors.red;
-          }
-          return Colors.black;
-        }()),
+        color: viewModel.color,
+        duration: Duration(milliseconds: 200),
       ),
       onTap: () {
         viewModel.toggleWall();
-        print('clicked');
       },
     );
   }
