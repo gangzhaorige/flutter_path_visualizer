@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_path_visualizer/component/wow.dart';
 import 'package:stacked/stacked.dart';
 
 import 'view_model.dart';
@@ -17,13 +18,13 @@ class Node extends ViewModelWidget<NodeModel>{
           viewModel.toggleWall();
         }
       },
-       child: GestureDetector(
+      child: GestureDetector(
         onTap: () {
           viewModel.toggleWall();
         },
         child: AnimatedContainer(
           alignment: Alignment.center,
-          height: 30,
+          height: viewModel.height,
           width: viewModel.width,
           decoration: BoxDecoration(
             border: Border.all(
@@ -34,8 +35,7 @@ class Node extends ViewModelWidget<NodeModel>{
               colors: viewModel.colors,
             ),
           ),
-          duration: Duration(milliseconds: 100),
-          curve: Curves.bounceInOut,
+          duration: Duration(seconds: 1),
         ),
       ),
     );

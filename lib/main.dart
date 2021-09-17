@@ -1,10 +1,10 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_path_visualizer/component/node/view_model.dart';
 import 'package:stacked/stacked.dart';
 import 'package:provider/provider.dart';
 import 'component/node/view.dart';
+import 'component/node/view_model.dart';
 import 'styles.dart';
 
 void main() {
@@ -42,7 +42,7 @@ class HomeView extends StatelessWidget {
       viewModelBuilder: () => HomeViewModel(),
       builder: (context, viewModel, child) => Scaffold(
         appBar: AppBar(
-          title: const Text('AppBar Demo'),
+          title: const Text('Algorithm Path Visualizer'),
           actions: <Widget>[
             IconButton(
               icon: const Icon(Icons.add_alert),
@@ -90,6 +90,85 @@ class HomeView extends StatelessWidget {
             runSpacing: 50,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
+              Center(
+                child: Wrap(
+                  spacing: 30,
+                  children: [
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 10,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.blueAccent,
+                              width: 1,
+                            ),
+                            color: ColorStyle.wall[0],
+                          ),
+                          height: 30,
+                          width: 30,
+                        ),
+                        Text('Wall'),
+                      ],
+                    ),
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 10,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.blueAccent,
+                              width: 1,
+                            ),
+                            color: ColorStyle.visited[0],
+                          ),
+                          height: 30,
+                          width: 30,
+                        ),
+                        Text('Visited'),
+                      ],
+                    ),
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 10,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.blueAccent,
+                              width: 1,
+                            ),
+                            color: ColorStyle.notVisited[0],
+                          ),
+                          height: 30,
+                          width: 30,
+                        ),
+                        Text('Non Visited'),
+                      ],
+                    ),
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 10,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.blueAccent,
+                              width: 1,
+                            ),
+                            color: ColorStyle.path[0],
+                          ),
+                          height: 30,
+                          width: 30,
+                        ),
+                        Text('Shortest Path'),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -305,16 +384,16 @@ class HomeViewModel extends ChangeNotifier {
     Queue<NodeModel> shortestPathOrder = getNodesInShortestPathOrder(grid[endRow][endCol]);
     for (int i = 0; i <= visitedNodeInOrder.length; i++) {
       if(i == visitedNodeInOrder.length) {
-        Future.delayed(Duration(milliseconds: 10 * i)).then((value) {
+        Future.delayed(Duration(milliseconds: 4 * i)).then((value) {
           animateShortestPath(shortestPathOrder);
         });
-        return Future.value(visitedNodeInOrder.length * 10 + shortestPathOrder.length * 10);
+         return Future.value(visitedNodeInOrder.length * 4 + shortestPathOrder.length * 4);
       }
-      Future.delayed(Duration(milliseconds: 10 * i)).then((value) {
+      Future.delayed(Duration(milliseconds: 4 * i)).then((value) {
         visitedNodeInOrder[i].updateVisited();
       });
     }
-    return Future.value(visitedNodeInOrder.length * 10);
+    return Future.value(visitedNodeInOrder.length * 4);
   }
 
   void animateShortestPath(Queue<NodeModel> shortestPathOrder) {

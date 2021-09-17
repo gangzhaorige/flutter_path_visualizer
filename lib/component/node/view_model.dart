@@ -15,7 +15,8 @@ class NodeModel extends BaseViewModel {
     this.visited = false,
     this.isWall = false,
     this.previousNode = null,
-    this.width = 30,
+    this.width = 20,
+    this.height = 20,
     this.colors = ColorStyle.notVisited,
     this.border = Colors.blueAccent,
   });
@@ -29,6 +30,7 @@ class NodeModel extends BaseViewModel {
   List<Color> colors;
   Color border;
   double width;
+  double height;
   NodeModel previousNode;
 
   void visit() {
