@@ -17,21 +17,26 @@ class Node extends ViewModelWidget<NodeModel>{
           viewModel.toggleWall();
         }
       },
-      child: AnimatedContainer(
-        alignment: Alignment.center,
-        height: 30,
-        width: viewModel.width,
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: viewModel.border,
-            width: 0.5,
+       child: GestureDetector(
+        onTap: () {
+          viewModel.toggleWall();
+        },
+        child: AnimatedContainer(
+          alignment: Alignment.center,
+          height: 30,
+          width: viewModel.width,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: viewModel.border,
+              width: 0.5,
+            ),
+            gradient: RadialGradient(
+              colors: viewModel.colors,
+            ),
           ),
-          gradient: RadialGradient(
-            colors: viewModel.colors,
-          ),
+          duration: Duration(milliseconds: 100),
+          curve: Curves.bounceInOut,
         ),
-        duration: Duration(milliseconds: 100),
-        curve: Curves.bounceInOut,
       ),
     );
   }
