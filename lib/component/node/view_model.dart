@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_path_visualizer/styles.dart';
 import 'package:stacked/stacked.dart';
 
 class NodeModel extends BaseViewModel {
@@ -14,7 +15,9 @@ class NodeModel extends BaseViewModel {
     this.visited = false,
     this.isWall = false,
     this.previousNode = null,
-    this.color = Colors.black,
+    this.width = 30,
+    this.colors = ColorStyle.notVisited,
+    this.border = Colors.blueAccent,
   });
 
   int row;
@@ -23,13 +26,15 @@ class NodeModel extends BaseViewModel {
   bool end;
   bool visited;
   bool isWall;
-  Color color;
+  List<Color> colors;
+  Color border;
+  double width;
   NodeModel previousNode;
 
   void visit() {
     visited = true;
     if(!start && !end) {
-      color = Colors.green;
+      colors = ColorStyle.visited;
     }
   }
 
@@ -39,14 +44,15 @@ class NodeModel extends BaseViewModel {
 
   updatePath() {
     if (!start && !end) {
-      color = Colors.pink;
+      colors = ColorStyle.path;
+      border = Colors.yellow;
       notifyListeners();
     }
   }
 
   void toggleWall() {
     if(!start && !end) {
-      color = !isWall ? Colors.yellow : Colors.black;
+      colors = !isWall ? ColorStyle.wall : ColorStyle.notVisited;
       isWall = !isWall;
       notifyListeners(); 
     }
@@ -57,8 +63,9 @@ class NodeModel extends BaseViewModel {
   }
 
   void resetColor() {
-    if(!start && !end && !isWall && color != Colors.black) {
-      color = Colors.black;
+    if(!start && !end && !isWall && colors[0] != Colors.white) {
+      colors = ColorStyle.notVisited;
+      border = Colors.blueAccent;
     }
     notifyListeners();
   }

@@ -5,6 +5,7 @@ import 'package:flutter_path_visualizer/component/node/view_model.dart';
 import 'package:stacked/stacked.dart';
 import 'package:provider/provider.dart';
 import 'component/node/view.dart';
+import 'styles.dart';
 
 void main() {
   runApp(MyApp());
@@ -99,7 +100,9 @@ class HomeView extends StatelessWidget {
                         for (int col = 0; col < viewModel.grid[0].length; col++) ...[
                           ChangeNotifierProvider.value(
                             value: viewModel.grid[row][col],
-                            child: Node(),
+                            child: Node(
+
+                            ),
                           ),
                         ]
                       ],
@@ -112,7 +115,7 @@ class HomeView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   MaterialButton(
-                    onPressed: !viewModel.isUpdating ? null : () async {
+                    onPressed: viewModel.isUpdating ? null : () async {
                       viewModel.change();
                       List<NodeModel> nodes = viewModel.bfs();
                       int timer = await viewModel.updateUI(nodes);
@@ -131,7 +134,7 @@ class HomeView extends StatelessWidget {
                     ),
                   ),
                   MaterialButton(
-                    onPressed: !viewModel.isUpdating ? null :() async {
+                    onPressed: viewModel.isUpdating ? null :() async {
                       viewModel.change();
                       List<NodeModel> nodes = viewModel.dfs();
                       int timer = await viewModel.updateUI(nodes);
@@ -149,8 +152,8 @@ class HomeView extends StatelessWidget {
                     ),
                   ),
                   MaterialButton(
-                    onPressed: !viewModel.isUpdating ? null : () {
-                      viewModel.generateGrid();
+                    onPressed: viewModel.isUpdating ? null : () {
+                      viewModel.resetGrid();
                     },
                     color: Colors.blueAccent,
                     disabledColor: Colors.red,
@@ -176,11 +179,12 @@ class HomeView extends StatelessWidget {
 class HomeViewModel extends ChangeNotifier {
   int maxRow = 50;
   int maxCol = 30;
-  int startRow = 49;
+  int startRow = 20;
   int startCol = 29;
   int endRow = 0;
   int endCol = 0;
-  bool isUpdating = true;
+  bool isUpdating = false;
+  bool mouseIsPressed = false;
 
   List<List<NodeModel>> grid = [];
 
@@ -206,15 +210,15 @@ class HomeViewModel extends ChangeNotifier {
             end: isEnd,
             visited: false,
             isWall: false,
-            color: () {
+            colors: () {
               if (isStart) {
-                return Colors.blue;
+                return ColorStyle.start;
               } else if (isEnd) {
-                return Colors.red;
+                return ColorStyle.end;
               } else {
-                return Colors.black;
+                return ColorStyle.notVisited;
               }
-            } ()
+            } (),
           ),
         );
       }
