@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_path_visualizer/component/wow.dart';
 import 'package:stacked/stacked.dart';
 
 import 'view_model.dart';
