@@ -35,6 +35,7 @@ class Node extends ViewModelWidget<NodeModel>{
             ),
           ),
           duration: Duration(seconds: 1),
+          child: Text(viewModel.nodeType.toString()[viewModel.nodeType.toString().length - 1]),
         ),
       ),
     );

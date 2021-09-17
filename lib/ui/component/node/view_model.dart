@@ -1,19 +1,22 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_path_visualizer/styles.dart';
 import 'package:stacked/stacked.dart';
+
+enum NodeType {
+  WALL,
+  STARTNODE,
+  ENDNODE,
+  EMPTY,
+}
 
 class NodeModel extends BaseViewModel {
   NodeModel({
     Key key,
     this.row,
     this.col,
-    this.start,
-    this.end,
     this.visited = false,
-    this.isWall = false,
+    this.nodeType = NodeType.EMPTY,
     this.previousNode = null,
     this.width = 20,
     this.height = 20,
@@ -23,10 +26,8 @@ class NodeModel extends BaseViewModel {
 
   int row;
   int col;
-  bool start;
-  bool end;
   bool visited;
-  bool isWall;
+  NodeType nodeType;
   List<Color> colors;
   Color border;
   double width;
@@ -35,7 +36,7 @@ class NodeModel extends BaseViewModel {
 
   void visit() {
     visited = true;
-    if(!start && !end) {
+    if(nodeType != NodeType.STARTNODE && nodeType != NodeType.ENDNODE) {
       colors = ColorStyle.visited;
     }
   }
@@ -45,7 +46,7 @@ class NodeModel extends BaseViewModel {
   }
 
   updatePath() {
-    if (!start && !end) {
+    if (nodeType != NodeType.STARTNODE && nodeType != NodeType.ENDNODE) {
       colors = ColorStyle.path;
       border = Colors.yellow;
       notifyListeners();
@@ -53,11 +54,15 @@ class NodeModel extends BaseViewModel {
   }
 
   void toggleWall() {
-    if(!start && !end) {
-      colors = !isWall ? ColorStyle.wall : ColorStyle.notVisited;
-      isWall = !isWall;
-      notifyListeners(); 
+    print(nodeType);
+    if(nodeType == NodeType.EMPTY) {
+      nodeType = NodeType.WALL;
+      colors = ColorStyle.wall;
+    } else if (nodeType == NodeType.WALL){
+      nodeType = NodeType.EMPTY;
+      colors = ColorStyle.notVisited;
     }
+    notifyListeners();
   }
 
   void unVisit() {
@@ -65,7 +70,7 @@ class NodeModel extends BaseViewModel {
   }
 
   void resetColor() {
-    if(!start && !end && !isWall && colors[0] != Colors.white) {
+    if(nodeType != NodeType.STARTNODE && nodeType != NodeType.ENDNODE && nodeType != NodeType.WALL && colors[0] != Colors.white) {
       colors = ColorStyle.notVisited;
       border = Colors.blueAccent;
     }
