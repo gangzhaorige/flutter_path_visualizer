@@ -4,30 +4,40 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_path_visualizer/ui/component/node/view_model.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 
 import '../../styles.dart';
 
+Map<NodeType, String> map = const {
+  NodeType.ENDNODE : 'End node',
+  NodeType.STARTNODE : 'Start node',
+  NodeType.WALL : 'Wall node',
+};
+
+Map<Algorithm, String> map2 = const {
+  Algorithm.BFS : 'Breath First Search',
+  Algorithm.DFS : 'Depth First Search',
+};
+
+enum Algorithm {
+  BFS,
+  DFS,
+}
 
 class PathVisualizerViewModel extends ChangeNotifier {
-  int maxRow = 50;
-  int maxCol = 30;
+  int maxRow = 80;
+  int maxCol = 40;
   int startRow = 20;
   int startCol = 29;
   int endRow = 0;
   int endCol = 0;
   bool isUpdating = false;
   bool mouseIsPressed = false;
-  String algorithm = 'Breath First Search';
-  NodeType curType = NodeType.WALL;
+  Algorithm curAlgorithm = Algorithm.BFS;
+  List<Algorithm> algorithms = [Algorithm.BFS, Algorithm.DFS];
 
-  Map<NodeType, String> map = const {
-    NodeType.ENDNODE : 'End node',
-    NodeType.STARTNODE : 'Start node',
-    NodeType.WALL : 'Wall node',
-  };
-
-  void changeAlgorithm(String str) {
-    algorithm = str;
+  void changeAlgorithm(Algorithm algo) {
+    curAlgorithm = algo;
     notifyListeners();
   }
 
@@ -151,7 +161,7 @@ class PathVisualizerViewModel extends ChangeNotifier {
     return false;
   }
 
-  Future<int> updateUI(List<NodeModel> visitedNodeInOrder) async {
+  Future<int> updateUI(List<NodeModel> visitedNodeInOrder,) async {
     Queue<NodeModel> shortestPathOrder = getNodesInShortestPathOrder(grid[endRow][endCol]);
     for (int i = 0; i <= visitedNodeInOrder.length; i++) {
       if(i == visitedNodeInOrder.length) {
@@ -178,11 +188,12 @@ class PathVisualizerViewModel extends ChangeNotifier {
     }
   }
 
-  void resetGrid() {
+  Future<void> resetGrid() async {
     for (List<NodeModel> row in grid) {
       for (NodeModel node in row) {
         node.unVisit();
         node.resetColor();
+        node.previousNode = null;
       }
     }
     notifyListeners();
@@ -193,8 +204,9 @@ class PathVisualizerViewModel extends ChangeNotifier {
       for (NodeModel node in row) {
         node.unVisit();
         node.resetColor();
+        node.previousNode = null;
         if(node.nodeType == NodeType.WALL) {
-          node.toggleWall();
+          node.toggleWall(NodeType.WALL, this);
         }
       }
     }
@@ -216,8 +228,38 @@ class PathVisualizerViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void changeType(NodeType type) {
-    curType = type;
+
+  void makeEmptyNode(int row, int col) {
+    grid[row][col].nodeType = NodeType.EMPTY;
+    grid[row][col].colors = [Colors.white,Colors.white];
     notifyListeners();
+  }
+
+  void removeStart() {
+    grid[startRow][startCol].nodeType = NodeType.EMPTY;
+    grid[startRow][startCol].colors = ColorStyle.notVisited;
+    grid[startRow][startCol].notifyListeners();
+  }
+
+  void removeEnd() {
+    grid[endRow][endCol].nodeType = NodeType.EMPTY;
+    grid[endRow][endCol].colors = ColorStyle.notVisited;
+    grid[endRow][endCol].notifyListeners();
+  }
+
+  void executeAlgorithm() async {
+    change();
+    List<NodeModel> nodes;
+    if(curAlgorithm == Algorithm.BFS) {
+      nodes = bfs();
+    } else {
+      nodes = dfs();
+    }
+    int timer = await updateUI(nodes);
+    Future.delayed(Duration(milliseconds: timer)).then(
+      (value) {
+        change();
+      }
+    );
   }
 }

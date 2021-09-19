@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_path_visualizer/store/actions.dart';
+import 'package:flutter_path_visualizer/store/app_state.dart';
 import 'package:flutter_path_visualizer/styles.dart';
+import 'package:flutter_path_visualizer/ui/pathVisualizer/view.dart';
+import 'package:flutter_path_visualizer/ui/pathVisualizer/view_model.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:redux/redux.dart';
 import 'package:stacked/stacked.dart';
 
 enum NodeType {
@@ -18,8 +24,8 @@ class NodeModel extends BaseViewModel {
     this.visited = false,
     this.nodeType = NodeType.EMPTY,
     this.previousNode = null,
-    this.width = 20,
-    this.height = 20,
+    this.width = 25,
+    this.height = 25,
     this.colors = ColorStyle.notVisited,
     this.border = Colors.blueAccent,
   });
@@ -53,15 +59,24 @@ class NodeModel extends BaseViewModel {
     }
   }
 
-  void toggleWall() {
-    print(nodeType);
-    if(nodeType == NodeType.EMPTY) {
-      nodeType = NodeType.WALL;
-      colors = ColorStyle.wall;
-    } else if (nodeType == NodeType.WALL){
-      nodeType = NodeType.EMPTY;
-      colors = ColorStyle.notVisited;
-    }
+  void toggleWall(NodeType curBrush, PathVisualizerViewModel parent) {
+    if(curBrush == NodeType.WALL) {
+      if(nodeType == NodeType.EMPTY) {
+        nodeType = NodeType.WALL;
+        colors = ColorStyle.wall;
+      } else if (nodeType == NodeType.WALL){
+        nodeType = NodeType.EMPTY;
+        colors = ColorStyle.notVisited;
+      } 
+    } else if (curBrush == NodeType.STARTNODE) {
+      nodeType = NodeType.STARTNODE;
+      colors = ColorStyle.start;
+    } else if (curBrush == NodeType.ENDNODE) {
+      nodeType = NodeType.ENDNODE;
+      colors = ColorStyle.end;
+    } 
+
+    
     notifyListeners();
   }
 
@@ -76,4 +91,18 @@ class NodeModel extends BaseViewModel {
     }
     notifyListeners();
   }
+
+  void updateNode(NodeType curBrush, PathVisualizerViewModel parent)  {
+    if(curBrush == NodeType.STARTNODE) {
+      parent.removeStart();
+      parent.startRow = row;
+      parent.startCol = col; 
+    } else if (curBrush == NodeType.ENDNODE) {
+      parent.removeEnd();
+      parent.endRow = row;
+      parent.endCol = col;
+    }
+    toggleWall(curBrush, parent);
+  }
+
 }

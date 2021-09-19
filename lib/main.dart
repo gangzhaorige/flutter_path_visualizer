@@ -1,9 +1,20 @@
 
 import 'package:flutter/material.dart';
-import 'ui/pathVisualizer/view.dart';
+import 'package:flutter_path_visualizer/store/app_state.dart';
+import 'package:flutter_path_visualizer/store/reducer.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:redux/redux.dart';
 
+import 'ui/component/node/view_model.dart';
+import 'ui/pathVisualizer/view.dart';
 void main() {
-  runApp(MyApp());
+  final store = Store<AppState>(
+    appReducer,
+    initialState: AppState(
+      brush: NodeType.WALL,
+    ),
+  );
+  runApp(StoreProvider(store: store,child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
