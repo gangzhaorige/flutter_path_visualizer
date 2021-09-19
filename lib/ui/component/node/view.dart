@@ -31,8 +31,7 @@ class Node extends ViewModelWidget<NodeModel>{
           onTap: () {
             viewModel.updateNode(curBrush, parent);
           },
-          child: Container(
-            alignment: Alignment.center,
+          child: AnimatedContainer(
             height: viewModel.height,
             width: viewModel.width,
             decoration: BoxDecoration(
@@ -44,6 +43,7 @@ class Node extends ViewModelWidget<NodeModel>{
                 colors: viewModel.colors,
               ),
             ),
+            duration: Duration(milliseconds: 500),
           ),
         ),
       ),

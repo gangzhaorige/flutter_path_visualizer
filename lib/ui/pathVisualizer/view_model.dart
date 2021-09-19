@@ -165,23 +165,23 @@ class PathVisualizerViewModel extends ChangeNotifier {
     Queue<NodeModel> shortestPathOrder = getNodesInShortestPathOrder(grid[endRow][endCol]);
     for (int i = 0; i <= visitedNodeInOrder.length; i++) {
       if(i == visitedNodeInOrder.length) {
-        Future.delayed(Duration(milliseconds: 4 * i)).then((value) {
+        Future.delayed(Duration(milliseconds: 16 * i)).then((value) {
           animateShortestPath(shortestPathOrder);
         });
-         return Future.value(visitedNodeInOrder.length * 4 + shortestPathOrder.length * 4);
+        return Future.value(visitedNodeInOrder.length * 16 + shortestPathOrder.length * 16);
       }
-      Future.delayed(Duration(milliseconds: 4 * i)).then((value) {
+      Future.delayed(Duration(milliseconds: 16 * i)).then((value) {
         visitedNodeInOrder[i].updateVisited();
       });
     }
-    return Future.value(visitedNodeInOrder.length * 4);
+    return Future.value(visitedNodeInOrder.length * 16);
   }
 
   void animateShortestPath(Queue<NodeModel> shortestPathOrder) {
     int i= 0;
     while(shortestPathOrder.isNotEmpty) {
       NodeModel cur = shortestPathOrder.removeFirst();
-      Future.delayed(Duration(milliseconds: 10 * i)).then((value) {
+      Future.delayed(Duration(milliseconds: 50 * i)).then((value) {
         cur.updatePath();
       });
       i++;

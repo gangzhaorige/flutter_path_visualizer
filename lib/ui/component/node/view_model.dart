@@ -74,9 +74,7 @@ class NodeModel extends BaseViewModel {
     } else if (curBrush == NodeType.ENDNODE) {
       nodeType = NodeType.ENDNODE;
       colors = ColorStyle.end;
-    } 
-
-    
+    }
     notifyListeners();
   }
 
