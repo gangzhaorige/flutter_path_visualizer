@@ -4,7 +4,6 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_path_visualizer/ui/component/node/view_model.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 
 import '../../styles.dart';
 
@@ -25,10 +24,10 @@ enum Algorithm {
 }
 
 class PathVisualizerViewModel extends ChangeNotifier {
-  int maxRow = 80;
-  int maxCol = 40;
-  int startRow = 20;
-  int startCol = 29;
+  int maxRow = 40;
+  int maxCol = 25;
+  int startRow = 5;
+  int startCol = 5;
   int endRow = 0;
   int endCol = 0;
   bool isUpdating = false;

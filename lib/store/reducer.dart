@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter_path_visualizer/store/actions.dart';
 
 import 'app_state.dart';

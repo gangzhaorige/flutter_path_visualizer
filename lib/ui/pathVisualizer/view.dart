@@ -66,10 +66,15 @@ class PathVisualizerView extends StatelessWidget {
                                       items: viewModel.algorithms.map((Algorithm value) {
                                         return DropdownMenuItem<Algorithm>(
                                           value: value,
-                                          child: Text(map2[value]),
+                                          child: Text(
+                                            map2[value],
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                            ),
+                                          ),
                                         );
                                       }).toList(),
-                                      onChanged: (_) {
+                                      onChanged: viewModel.isUpdating ? null : (_) {
                                         viewModel.changeAlgorithm(_);
                                       },
                                     ),
@@ -159,10 +164,15 @@ class PathVisualizerView extends StatelessWidget {
                                         items: <NodeType>[NodeType.STARTNODE, NodeType.ENDNODE, NodeType.WALL].map((NodeType node) {
                                           return DropdownMenuItem<NodeType>(
                                             value: node,
-                                            child: Text(map[node]),
+                                            child: Text(
+                                              map[node],
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                              ),
+                                            ),
                                           );
                                         }).toList(),
-                                        onChanged: (chosenBrush) {
+                                        onChanged: viewModel.isUpdating ? null : (chosenBrush) {
                                           StoreProvider.of<AppState>(context).dispatch(
                                             UpdateBrushAction(
                                               updatedBrush: chosenBrush,
@@ -183,18 +193,50 @@ class PathVisualizerView extends StatelessWidget {
                 ),
                 Expanded(
                   child: Container(
-                    padding: EdgeInsets.all(25),
-                    child: Wrap(
-                      runSpacing: 75,
-                      crossAxisAlignment: WrapCrossAlignment.start,
-                      alignment: WrapAlignment.start,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         Container(
-                          padding: EdgeInsets.only(top: 30),
                           alignment: Alignment.center,
                           child: Wrap(
                             spacing: 30,
                             children: [
+                              Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                spacing: 10,
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: Colors.blueAccent,
+                                        width: 1,
+                                      ),
+                                      color: Colors.redAccent,
+                                    ),
+                                    height: 30,
+                                    width: 30,
+                                  ),
+                                  Text('Start Node'),
+                                ],
+                              ),
+                              Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                spacing: 10,
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: Colors.blueAccent,
+                                        width: 1,
+                                      ),
+                                      color: Colors.blue,
+                                    ),
+                                    height: 30,
+                                    width: 30,
+                                  ),
+                                  Text('End Node'),
+                                ],
+                              ),
                               Wrap(
                                 crossAxisAlignment: WrapCrossAlignment.center,
                                 spacing: 10,
@@ -272,7 +314,6 @@ class PathVisualizerView extends StatelessWidget {
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             for (int row = 0; row < viewModel.grid.length; row++) ...[
                               Column(

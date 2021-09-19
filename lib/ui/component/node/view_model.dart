@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_path_visualizer/store/actions.dart';
-import 'package:flutter_path_visualizer/store/app_state.dart';
 import 'package:flutter_path_visualizer/styles.dart';
-import 'package:flutter_path_visualizer/ui/pathVisualizer/view.dart';
 import 'package:flutter_path_visualizer/ui/pathVisualizer/view_model.dart';
-import 'package:flutter_redux/flutter_redux.dart';
-import 'package:redux/redux.dart';
 import 'package:stacked/stacked.dart';
 
 enum NodeType {
@@ -24,8 +19,8 @@ class NodeModel extends BaseViewModel {
     this.visited = false,
     this.nodeType = NodeType.EMPTY,
     this.previousNode = null,
-    this.width = 25,
-    this.height = 25,
+    this.width = 35,
+    this.height = 35,
     this.colors = ColorStyle.notVisited,
     this.border = Colors.blueAccent,
   });
