@@ -47,7 +47,7 @@ class NodeState extends State<Node> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return AnimatedContainer(
       height: 20,
       width: 20,
       decoration: BoxDecoration(
@@ -57,6 +57,7 @@ class NodeState extends State<Node> {
           color: Colors.lightBlue,
         ),
       ),
+      duration: Duration(milliseconds: 500),
     );
   }
 }

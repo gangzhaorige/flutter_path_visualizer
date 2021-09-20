@@ -46,7 +46,7 @@ class _PathVisualizerState extends State<PathVisualizer> {
   Algorithm curAlgorithm = Algorithm.bfs;
 
   List<List<Node>> nodesStatus = [];
-  List<List<GlobalKey<NodeState>>> nodeKey = List.generate(50, (row) => List.generate(30, (col) => GlobalKey<NodeState>(debugLabel: '$row $col')));
+  List<List<GlobalKey<NodeState>>> nodeKey = List.generate(100, (row) => List.generate(70, (col) => GlobalKey<NodeState>(debugLabel: '$row $col')));
   List<NodeDescription> nodeDescriptions = [
     NodeDescription(
       description: 'Start Node',
