@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_path_visualizer/components/node_description.dart';
 
 import 'components/appbar/appbar.dart';
 import 'components/node/node.dart';
@@ -46,6 +47,32 @@ class _PathVisualizerState extends State<PathVisualizer> {
 
   List<List<Node>> nodesStatus = [];
   List<List<GlobalKey<NodeState>>> nodeKey = List.generate(50, (row) => List.generate(30, (col) => GlobalKey<NodeState>(debugLabel: '$row $col')));
+  List<NodeDescription> nodeDescriptions = [
+    NodeDescription(
+      description: 'Start Node',
+      color: Colors.redAccent,
+    ),
+    NodeDescription(
+      description: 'End Node',
+      color: Colors.green,
+    ),
+    NodeDescription(
+      description: 'Wall',
+      color: Colors.black,
+    ),
+    NodeDescription(
+      description: 'Visited',
+      color: Colors.blueAccent,
+    ),
+    NodeDescription(
+      description: 'Not Visited',
+      color: Colors.white,
+    ),
+    NodeDescription(
+      description: 'Path From Start to End',
+      color: Colors.yellow,
+    )
+  ];
 
   List<List<int>> directions = [
     [1, 0],
@@ -116,13 +143,11 @@ class _PathVisualizerState extends State<PathVisualizer> {
     if (curNode.row == endRow && curNode.col == endCol) {
       return;
     }
-    for (List<int> direction in directions) {
-      int curRow = curNode.row + direction[0];
-      int curCol = curNode.col + direction[1];
-      if (!isOutOfBoard(curRow, curCol) && !nodesStatus[curRow][curCol].visited) {
-        Node next = nodesStatus[curRow][curCol];
-        next.prev = curNode;
-        dfsHelper(list, next);
+    List<Node> neighbors = getNeighbors(curNode.row, curNode.col);
+    for (Node model in neighbors) {
+      if (!model.visited) {
+        model.prev = curNode;
+        dfsHelper(list, model);
       }
     }
     return;
@@ -306,123 +331,18 @@ class _PathVisualizerState extends State<PathVisualizer> {
             executeAlgorithm: executeAlgorithm,
           ),
           Expanded(
-            child: Wrap(
-              alignment: WrapAlignment.spaceAround,
-              crossAxisAlignment: WrapCrossAlignment.start,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
                 Container(
                   alignment: Alignment.center,
                   child: Wrap(
+                    alignment: WrapAlignment.center,
                     spacing: 30,
                     children: [
-                      Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        spacing: 10,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.blueAccent,
-                                width: 1,
-                              ),
-                              color: Colors.redAccent,
-                            ),
-                            height: 30,
-                            width: 30,
-                          ),
-                          const Text('Start Node'),
-                        ],
-                      ),
-                      Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        spacing: 10,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.blueAccent,
-                                width: 1,
-                              ),
-                              color: Colors.blue,
-                            ),
-                            height: 30,
-                            width: 30,
-                          ),
-                          const Text('End Node'),
-                        ],
-                      ),
-                      Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        spacing: 10,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.blueAccent,
-                                width: 1,
-                              ),
-                              color: Colors.black,
-                            ),
-                            height: 30,
-                            width: 30,
-                          ),
-                          const Text('Wall'),
-                        ],
-                      ),
-                      Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        spacing: 10,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.blueAccent,
-                                width: 1,
-                              ),
-                              color: Colors.blue,
-                            ),
-                            height: 30,
-                            width: 30,
-                          ),
-                          const Text('Visited'),
-                        ],
-                      ),
-                      Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        spacing: 10,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.blueAccent,
-                                width: 1,
-                              ),
-                              color: Colors.white,
-                            ),
-                            height: 30,
-                            width: 30,
-                          ),
-                          const Text('Non Visited'),
-                        ],
-                      ),
-                      Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        spacing: 10,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.blueAccent,
-                                width: 1,
-                              ),
-                              color: Colors.yellow,
-                            ),
-                            height: 30,
-                            width: 30,
-                          ),
-                          Text('Shortest Path'),
-                        ],
-                      ),
+                      for (NodeDescription node in nodeDescriptions) ...[
+                        node,
+                      ]
                     ],
                   ),
                 ),
@@ -451,12 +371,12 @@ class _PathVisualizerState extends State<PathVisualizer> {
                       ),
                     ],
                   ],
-                )
+                ),
               ],
             ),
           ),
         ],
-      )
+      ),
     );
   }
 }
