@@ -51,6 +51,7 @@ class PathVisualizerViewModel extends ChangeNotifier {
 
   void generateGrid() {
     grid.clear();
+
     for (int i = 0; i < maxRow; i++) {
       List<NodeModel> row = [];
       for (int j = 0; j < maxCol; j++) {
@@ -222,7 +223,7 @@ class PathVisualizerViewModel extends ChangeNotifier {
     return queue;
   }
 
-  void change() {
+  void toggleUpdate() {
     isUpdating = !isUpdating;
     notifyListeners();
   }
@@ -247,18 +248,22 @@ class PathVisualizerViewModel extends ChangeNotifier {
   }
 
   void executeAlgorithm() async {
-    change();
-    List<NodeModel> nodes;
-    if(curAlgorithm == Algorithm.BFS) {
-      nodes = bfs();
-    } else {
-      nodes = dfs();
-    }
-    int timer = await updateUI(nodes);
-    Future.delayed(Duration(milliseconds: timer)).then(
-      (value) {
-        change();
+    toggleUpdate();
+    resetGrid();
+    Future.delayed(Duration(microseconds: 1000)).then((value) async {
+      List<NodeModel> nodes;
+      if(curAlgorithm == Algorithm.BFS) {
+        nodes = bfs();
+      } else {
+        nodes = dfs();
       }
-    );
+      int timer = await updateUI(nodes);
+      Future.delayed(Duration(milliseconds: timer)).then(
+        (value) {
+          toggleUpdate();
+        }
+      );
+    });
+    
   }
 }
