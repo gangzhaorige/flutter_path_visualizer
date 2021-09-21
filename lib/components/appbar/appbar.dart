@@ -8,19 +8,24 @@ class CustomAppBar extends StatelessWidget {
     this.curBrush,
     this.onBrushChange,
     this.onAlgorithmChange,
+    this.onSpeedChange,
     this.resetGrid,
     this.resetAll,
     this.executeAlgorithm,
+    this.curSpeed,
   }) : super(key: key);
 
  
   final Brush curBrush;
+  final Speed curSpeed;
   final Function onBrushChange;
   final Algorithm curAlgorithm;
   final Function onAlgorithmChange;
+  final Function onSpeedChange;
   final Function executeAlgorithm;
   final Function resetGrid;
   final Function resetAll;
+  
 
   @override
   Widget build(BuildContext context) {
@@ -132,14 +137,42 @@ class CustomAppBar extends StatelessWidget {
                       resetGrid();
                     },
                   ),
-                  const Text(
-                    'Speed: fast',
-                    style: TextStyle(
-                      color: Colors.white,
-                        fontSize: 18,
-                    ),
+                  Wrap(
+                    spacing: 5,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    direction: Axis.horizontal,
+                    children: [
+                      const Text(
+                        'Speed',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                        ),
+                      ),
+                      DropdownButton<Speed>(
+                        dropdownColor: Colors.blueAccent,
+                        style: const TextStyle(
+                          fontSize: 18,
+                        ),
+                        value: curSpeed,
+                        items: <Speed>[Speed.fast, Speed.average, Speed.slow].map((Speed type) {
+                          return DropdownMenuItem<Speed>(
+                            value: type,
+                            child: Text(
+                              speedMap[type],
+                              style: const TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (chosenSpeed) {
+                          onSpeedChange(chosenSpeed);
+                        },
+                      ),
+                    ],
                   ),
-                   Wrap(
+                  Wrap(
                     spacing: 5,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     direction: Axis.horizontal,

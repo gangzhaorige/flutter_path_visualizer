@@ -17,6 +17,18 @@ Map<Algorithm, String> algorithmMap = const {
   Algorithm.dfs : 'Depth First Search',
 };
 
+Map<Speed, String> speedMap = const {
+  Speed.fast : 'Fast',
+  Speed.average : 'Average',
+  Speed.slow : 'Slow',
+};
+
+Map<Speed, int> speedValue = const {
+  Speed.fast : 10,
+  Speed.average : 15,
+  Speed.slow : 20,
+};
+
 enum Brush {
   wall,
   start,
@@ -26,6 +38,12 @@ enum Brush {
 enum Algorithm {
   dfs,
   bfs,
+}
+
+enum Speed {
+  fast,
+  average,
+  slow,
 }
 
 class PathVisualizer extends StatefulWidget {
@@ -44,9 +62,10 @@ class _PathVisualizerState extends State<PathVisualizer> {
 
   Brush curBrush = Brush.wall;
   Algorithm curAlgorithm = Algorithm.bfs;
+  Speed curSpeed = Speed.fast; 
 
   List<List<Node>> nodesStatus = [];
-  List<List<GlobalKey<NodeState>>> nodeKey = List.generate(100, (row) => List.generate(70, (col) => GlobalKey<NodeState>(debugLabel: '$row $col')));
+  List<List<GlobalKey<NodeState>>> nodeKey = List.generate(70, (row) => List.generate(30, (col) => GlobalKey<NodeState>(debugLabel: '$row $col')));
   List<NodeDescription> nodeDescriptions = [
     NodeDescription(
       description: 'Start Node',
@@ -84,7 +103,7 @@ class _PathVisualizerState extends State<PathVisualizer> {
   @override
   void initState() {
     super.initState();
-    for(int row = 0; row < 50; row++) {
+    for(int row = 0; row < 70; row++) {
       List<Node> curRow = [];
       for(int col = 0; col < 30; col++) {
         curRow.add(
@@ -232,24 +251,24 @@ class _PathVisualizerState extends State<PathVisualizer> {
   Future<int> visualizeAlgorithm(List<Node> orderOfVisit, List<Node> pathingOrder) {
     for(int i = 0; i <= orderOfVisit.length; i++) {
       if(i == orderOfVisit.length) {
-        Future.delayed(Duration(milliseconds: 5 * i)).then((value) {
+        Future.delayed(Duration(milliseconds: speedValue[curSpeed] * i)).then((value) {
           visualizeFromStartToEnd(pathingOrder);
         });
-        return Future.value(orderOfVisit.length * 5 + pathingOrder.length * 5);
+        return Future.value(orderOfVisit.length * speedValue[curSpeed] + pathingOrder.length * speedValue[curSpeed]);
       }
-      Future.delayed(Duration(milliseconds: 5 * i)).then((value) {
+      Future.delayed(Duration(milliseconds: speedValue[curSpeed] * i)).then((value) {
         if (!isStartOrEnd(orderOfVisit[i].row, orderOfVisit[i].col)) {
           updateVisit(orderOfVisit[i].row, orderOfVisit[i].col, Colors.blue);
         }
       });
     }
-    return Future.value(orderOfVisit.length * 5);
+    return Future.value(orderOfVisit.length * speedValue[curSpeed]);
   }
 
   void visualizeFromStartToEnd(List<Node> pathingOrder) {
     int index = 0;
     for(Node cur in pathingOrder) {
-      Future.delayed(Duration(milliseconds: index * 5)).then((value) {
+      Future.delayed(Duration(milliseconds: index * speedValue[curSpeed])).then((value) {
         if (!isStartOrEnd(cur.row, cur.col)) {
           updateVisit(cur.row, cur.col, Colors.yellow);
         }
@@ -314,6 +333,12 @@ class _PathVisualizerState extends State<PathVisualizer> {
     });
   }
 
+  void setSpeed(Speed type) {
+    setState(() {
+      curSpeed = type;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -323,12 +348,14 @@ class _PathVisualizerState extends State<PathVisualizer> {
         children: [
           CustomAppBar(
             curBrush: curBrush,
-            onBrushChange: setBrush,
             curAlgorithm: curAlgorithm,
+            curSpeed: curSpeed,
+            onBrushChange: setBrush,
             onAlgorithmChange: setAlgorithm,
             resetAll: resetAll,
             resetGrid: resetGrid,
             executeAlgorithm: executeAlgorithm,
+            onSpeedChange: setSpeed,
           ),
           Expanded(
             child: Column(
