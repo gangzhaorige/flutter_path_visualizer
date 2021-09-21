@@ -55,8 +55,8 @@ class NodeState extends State<Node> {
       key: widget.cardKey,
       flipOnTouch: false,
       front: Container(
-        height: 25,
-        width: 25,
+        height: 30,
+        width: 30,
         decoration: BoxDecoration(
           color: nodeColor,
           border: Border.all(
@@ -66,8 +66,8 @@ class NodeState extends State<Node> {
         ),
       ),
       back: Container(
-        height: 25,
-        width: 25,
+        height: 30,
+        width: 30,
         decoration: BoxDecoration(
           color: nodeColor,
           border: Border.all(

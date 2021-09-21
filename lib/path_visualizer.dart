@@ -61,14 +61,16 @@ class _PathVisualizerState extends State<PathVisualizer> {
   int startCol = 0;
   int endRow = 49;
   int endCol = 19;
+  int totalRow = 60;
+  int totalCol = 30;
 
   Brush curBrush = Brush.wall;
   Algorithm curAlgorithm = Algorithm.bfs;
   Speed curSpeed = Speed.fast; 
 
   List<List<Node>> nodesStatus = [];
-  List<List<GlobalKey<NodeState>>> nodeKey = List.generate(70, (row) => List.generate(30, (col) => GlobalKey<NodeState>(debugLabel: '$row $col')));
-  List<List<GlobalKey<FlipCardState>>> flipKey = List.generate(70, (row) => List.generate(30, (col) => GlobalKey<FlipCardState>(debugLabel: '$row $col')));
+  List<List<GlobalKey<NodeState>>> nodeKey;
+  List<List<GlobalKey<FlipCardState>>> flipKey;
   List<NodeDescription> nodeDescriptions = [
     NodeDescription(
       description: 'Start Node',
@@ -106,9 +108,11 @@ class _PathVisualizerState extends State<PathVisualizer> {
   @override
   void initState() {
     super.initState();
-    for(int row = 0; row < 70; row++) {
+    nodeKey = List.generate(totalRow, (row) => List.generate(totalCol, (col) => GlobalKey<NodeState>(debugLabel: '$row $col')));
+    flipKey = List.generate(totalRow, (row) => List.generate(totalCol, (col) => GlobalKey<FlipCardState>(debugLabel: '$row $col')));
+    for(int row = 0; row < totalRow; row++) {
       List<Node> curRow = [];
-      for(int col = 0; col < 30; col++) {
+      for(int col = 0; col < totalCol; col++) {
         curRow.add(
           Node(
             key: nodeKey[row][col],
