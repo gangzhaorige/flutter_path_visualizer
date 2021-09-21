@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_path_visualizer/colorStyle.dart';
 
 class NodeDescription extends StatelessWidget {
   NodeDescription({
@@ -19,7 +20,7 @@ class NodeDescription extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
             border: Border.all(
-              color: Colors.blueAccent,
+              color: ColorStyle.primary,
               width: 1,
             ),
             color: color,
@@ -33,5 +34,4 @@ class NodeDescription extends StatelessWidget {
       ],
     );
   }
-  
 }

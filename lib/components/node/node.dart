@@ -1,4 +1,6 @@
+import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_path_visualizer/colorStyle.dart';
 
 class Node extends StatefulWidget {
   Node({
@@ -8,6 +10,7 @@ class Node extends StatefulWidget {
     this.visited = false,
     this.nodeColor = Colors.white,
     this.isWall = false,
+    this.cardKey,
   }) : super(key: key);
 
   int row;
@@ -16,13 +19,14 @@ class Node extends StatefulWidget {
   bool isWall;
   Color nodeColor;
   Node prev;
+  GlobalKey<FlipCardState> cardKey;
 
   @override
   NodeState createState() => NodeState();
 }
 
 class NodeState extends State<Node> {
-
+  
   int row;
   int col;
   bool visited;
@@ -43,19 +47,33 @@ class NodeState extends State<Node> {
     });
   }
 
-
-
   @override
   Widget build(BuildContext context) {
-    print('rebuild');
-    return Container(
-      height: 25,
-      width: 25,
-      decoration: BoxDecoration(
-        color: nodeColor,
-        border: Border.all(
-          width: 1,
-          color: Colors.lightBlue,
+    return FlipCard(
+      speed: 400,
+      direction: FlipDirection.HORIZONTAL,
+      key: widget.cardKey,
+      flipOnTouch: false,
+      front: Container(
+        height: 25,
+        width: 25,
+        decoration: BoxDecoration(
+          color: nodeColor,
+          border: Border.all(
+            width: 1,
+            color: ColorStyle.nodeBorder,
+          ),
+        ),
+      ),
+      back: Container(
+        height: 25,
+        width: 25,
+        decoration: BoxDecoration(
+          color: nodeColor,
+          border: Border.all(
+            width: 1,
+            color: ColorStyle.nodeBorder,
+          ),
         ),
       ),
     );

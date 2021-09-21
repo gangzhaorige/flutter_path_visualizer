@@ -1,6 +1,8 @@
 import 'dart:collection';
 
+import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_path_visualizer/colorStyle.dart';
 import 'package:flutter_path_visualizer/components/node_description.dart';
 
 import 'components/appbar/appbar.dart';
@@ -66,30 +68,31 @@ class _PathVisualizerState extends State<PathVisualizer> {
 
   List<List<Node>> nodesStatus = [];
   List<List<GlobalKey<NodeState>>> nodeKey = List.generate(70, (row) => List.generate(30, (col) => GlobalKey<NodeState>(debugLabel: '$row $col')));
+  List<List<GlobalKey<FlipCardState>>> flipKey = List.generate(70, (row) => List.generate(30, (col) => GlobalKey<FlipCardState>(debugLabel: '$row $col')));
   List<NodeDescription> nodeDescriptions = [
     NodeDescription(
       description: 'Start Node',
-      color: Colors.redAccent,
+      color: ColorStyle.start
     ),
     NodeDescription(
       description: 'End Node',
-      color: Colors.green,
+      color: ColorStyle.end
     ),
     NodeDescription(
       description: 'Wall',
-      color: Colors.black,
+      color: ColorStyle.wall,
     ),
     NodeDescription(
       description: 'Visited',
-      color: Colors.blueAccent,
+      color: ColorStyle.visited,
     ),
     NodeDescription(
       description: 'Not Visited',
-      color: Colors.white,
+      color: ColorStyle.notVisited
     ),
     NodeDescription(
       description: 'Path From Start to End',
-      color: Colors.yellow,
+      color: ColorStyle.startToEnd,
     )
   ];
 
@@ -109,9 +112,10 @@ class _PathVisualizerState extends State<PathVisualizer> {
         curRow.add(
           Node(
             key: nodeKey[row][col],
+            cardKey: flipKey[row][col],
             row: row,
             col: col,
-            nodeColor: row == startRow && col == startCol ? Colors.green : row == endRow && col == endCol ? Colors.red : null,
+            nodeColor: row == startRow && col == startCol ? ColorStyle.start : row == endRow && col == endCol ? ColorStyle.end : null,
           ),
         );
       }
@@ -217,22 +221,24 @@ class _PathVisualizerState extends State<PathVisualizer> {
     if (!isStartOrEnd(row, col)) {
       if (curBrush == Brush.wall) {
         if (nodesStatus[row][col].isWall) {
-          updateVisit(row, col, Colors.white);
+          updateVisit(row, col, ColorStyle.notVisited);
           nodesStatus[row][col].isWall = false;
         } else {
-          updateVisit(row, col, Colors.black);
+          updateVisit(row, col, ColorStyle.wall);
           nodesStatus[row][col].isWall = true;
         }
       } else if (curBrush == Brush.start && !isEnd(row, col)) {
-        updateVisit(startRow, startCol, Colors.white);
+        nodesStatus[row][col].isWall = false;
+        updateVisit(startRow, startCol, ColorStyle.notVisited);
         startRow = row;
         startCol = col;
-        updateVisit(startRow, startCol, Colors.green);
+        updateVisit(startRow, startCol, ColorStyle.start);
       } else if (curBrush == Brush.end && !isStart(row, col)) {
-        updateVisit(endRow, endCol, Colors.white);
+        nodesStatus[row][col].isWall = false;
+        updateVisit(endRow, endCol, ColorStyle.notVisited);
         endRow = row;
         endCol = col;
-        updateVisit(endRow, endCol, Colors.red);
+        updateVisit(endRow, endCol, ColorStyle.end);
       }
     }
   }
@@ -258,7 +264,8 @@ class _PathVisualizerState extends State<PathVisualizer> {
       }
       Future.delayed(Duration(milliseconds: speedValue[curSpeed] * i)).then((value) {
         if (!isStartOrEnd(orderOfVisit[i].row, orderOfVisit[i].col)) {
-          updateVisit(orderOfVisit[i].row, orderOfVisit[i].col, Colors.blue);
+          updateVisit(orderOfVisit[i].row, orderOfVisit[i].col, ColorStyle.visited);
+          orderOfVisit[i].cardKey.currentState.toggleCard();
         }
       });
     }
@@ -270,7 +277,8 @@ class _PathVisualizerState extends State<PathVisualizer> {
     for(Node cur in pathingOrder) {
       Future.delayed(Duration(milliseconds: index * speedValue[curSpeed])).then((value) {
         if (!isStartOrEnd(cur.row, cur.col)) {
-          updateVisit(cur.row, cur.col, Colors.yellow);
+          updateVisit(cur.row, cur.col, ColorStyle.startToEnd);
+          cur.cardKey.currentState.toggleCard();
         }
       });
       index++;
@@ -285,7 +293,7 @@ class _PathVisualizerState extends State<PathVisualizer> {
         if(isStartOrEnd(i, j) || curNode.isWall) {
           continue;
         }
-        nodeKey[i][j].currentState.setColor(Colors.white);
+        nodeKey[i][j].currentState.setColor(ColorStyle.notVisited);
         curNode.prev = null;
       }
     }
@@ -300,7 +308,7 @@ class _PathVisualizerState extends State<PathVisualizer> {
           continue;
         }
         curNode.isWall = false;
-        nodeKey[i][j].currentState.setColor(Colors.white);
+        nodeKey[i][j].currentState.setColor(ColorStyle.notVisited);
         curNode.prev = null;
       }
     }
@@ -384,12 +392,14 @@ class _PathVisualizerState extends State<PathVisualizer> {
                               onEnter: (event) {
                                 if(event.down) {
                                   paint(curNode.row, curNode.col);
+                                  curNode.cardKey.currentState.toggleCard();
                                 }
                               },
                               child: GestureDetector(
                                 child: curNode,
                                 onTap: () {
                                   paint(curNode.row, curNode.col);
+                                  curNode.cardKey.currentState.toggleCard();
                                 }
                               ),
                             ),
