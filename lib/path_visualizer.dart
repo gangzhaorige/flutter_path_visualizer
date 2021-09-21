@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_path_visualizer/components/node_description.dart';
 
 import 'components/appbar/appbar.dart';
 import 'components/node/node.dart';
@@ -16,6 +17,18 @@ Map<Algorithm, String> algorithmMap = const {
   Algorithm.dfs : 'Depth First Search',
 };
 
+Map<Speed, String> speedMap = const {
+  Speed.fast : 'Fast',
+  Speed.average : 'Average',
+  Speed.slow : 'Slow',
+};
+
+Map<Speed, int> speedValue = const {
+  Speed.fast : 10,
+  Speed.average : 15,
+  Speed.slow : 20,
+};
+
 enum Brush {
   wall,
   start,
@@ -25,6 +38,12 @@ enum Brush {
 enum Algorithm {
   dfs,
   bfs,
+}
+
+enum Speed {
+  fast,
+  average,
+  slow,
 }
 
 class PathVisualizer extends StatefulWidget {
@@ -43,9 +62,36 @@ class _PathVisualizerState extends State<PathVisualizer> {
 
   Brush curBrush = Brush.wall;
   Algorithm curAlgorithm = Algorithm.bfs;
+  Speed curSpeed = Speed.fast; 
 
   List<List<Node>> nodesStatus = [];
-  List<List<GlobalKey<NodeState>>> nodeKey = List.generate(50, (row) => List.generate(30, (col) => GlobalKey<NodeState>(debugLabel: '$row $col')));
+  List<List<GlobalKey<NodeState>>> nodeKey = List.generate(70, (row) => List.generate(30, (col) => GlobalKey<NodeState>(debugLabel: '$row $col')));
+  List<NodeDescription> nodeDescriptions = [
+    NodeDescription(
+      description: 'Start Node',
+      color: Colors.redAccent,
+    ),
+    NodeDescription(
+      description: 'End Node',
+      color: Colors.green,
+    ),
+    NodeDescription(
+      description: 'Wall',
+      color: Colors.black,
+    ),
+    NodeDescription(
+      description: 'Visited',
+      color: Colors.blueAccent,
+    ),
+    NodeDescription(
+      description: 'Not Visited',
+      color: Colors.white,
+    ),
+    NodeDescription(
+      description: 'Path From Start to End',
+      color: Colors.yellow,
+    )
+  ];
 
   List<List<int>> directions = [
     [1, 0],
@@ -57,7 +103,7 @@ class _PathVisualizerState extends State<PathVisualizer> {
   @override
   void initState() {
     super.initState();
-    for(int row = 0; row < 50; row++) {
+    for(int row = 0; row < 70; row++) {
       List<Node> curRow = [];
       for(int col = 0; col < 30; col++) {
         curRow.add(
@@ -116,13 +162,11 @@ class _PathVisualizerState extends State<PathVisualizer> {
     if (curNode.row == endRow && curNode.col == endCol) {
       return;
     }
-    for (List<int> direction in directions) {
-      int curRow = curNode.row + direction[0];
-      int curCol = curNode.col + direction[1];
-      if (!isOutOfBoard(curRow, curCol) && !nodesStatus[curRow][curCol].visited) {
-        Node next = nodesStatus[curRow][curCol];
-        next.prev = curNode;
-        dfsHelper(list, next);
+    List<Node> neighbors = getNeighbors(curNode.row, curNode.col);
+    for (Node model in neighbors) {
+      if (!model.visited) {
+        model.prev = curNode;
+        dfsHelper(list, model);
       }
     }
     return;
@@ -207,24 +251,24 @@ class _PathVisualizerState extends State<PathVisualizer> {
   Future<int> visualizeAlgorithm(List<Node> orderOfVisit, List<Node> pathingOrder) {
     for(int i = 0; i <= orderOfVisit.length; i++) {
       if(i == orderOfVisit.length) {
-        Future.delayed(Duration(milliseconds: 5 * i)).then((value) {
+        Future.delayed(Duration(milliseconds: speedValue[curSpeed] * i)).then((value) {
           visualizeFromStartToEnd(pathingOrder);
         });
-        return Future.value(orderOfVisit.length * 5 + pathingOrder.length * 5);
+        return Future.value(orderOfVisit.length * speedValue[curSpeed] + pathingOrder.length * speedValue[curSpeed]);
       }
-      Future.delayed(Duration(milliseconds: 5 * i)).then((value) {
+      Future.delayed(Duration(milliseconds: speedValue[curSpeed] * i)).then((value) {
         if (!isStartOrEnd(orderOfVisit[i].row, orderOfVisit[i].col)) {
           updateVisit(orderOfVisit[i].row, orderOfVisit[i].col, Colors.blue);
         }
       });
     }
-    return Future.value(orderOfVisit.length * 5);
+    return Future.value(orderOfVisit.length * speedValue[curSpeed]);
   }
 
   void visualizeFromStartToEnd(List<Node> pathingOrder) {
     int index = 0;
     for(Node cur in pathingOrder) {
-      Future.delayed(Duration(milliseconds: index * 5)).then((value) {
+      Future.delayed(Duration(milliseconds: index * speedValue[curSpeed])).then((value) {
         if (!isStartOrEnd(cur.row, cur.col)) {
           updateVisit(cur.row, cur.col, Colors.yellow);
         }
@@ -289,6 +333,12 @@ class _PathVisualizerState extends State<PathVisualizer> {
     });
   }
 
+  void setSpeed(Speed type) {
+    setState(() {
+      curSpeed = type;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -298,131 +348,28 @@ class _PathVisualizerState extends State<PathVisualizer> {
         children: [
           CustomAppBar(
             curBrush: curBrush,
-            onBrushChange: setBrush,
             curAlgorithm: curAlgorithm,
+            curSpeed: curSpeed,
+            onBrushChange: setBrush,
             onAlgorithmChange: setAlgorithm,
             resetAll: resetAll,
             resetGrid: resetGrid,
             executeAlgorithm: executeAlgorithm,
+            onSpeedChange: setSpeed,
           ),
           Expanded(
-            child: Wrap(
-              alignment: WrapAlignment.spaceAround,
-              crossAxisAlignment: WrapCrossAlignment.start,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
                 Container(
                   alignment: Alignment.center,
                   child: Wrap(
+                    alignment: WrapAlignment.center,
                     spacing: 30,
                     children: [
-                      Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        spacing: 10,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.blueAccent,
-                                width: 1,
-                              ),
-                              color: Colors.redAccent,
-                            ),
-                            height: 30,
-                            width: 30,
-                          ),
-                          const Text('Start Node'),
-                        ],
-                      ),
-                      Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        spacing: 10,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.blueAccent,
-                                width: 1,
-                              ),
-                              color: Colors.blue,
-                            ),
-                            height: 30,
-                            width: 30,
-                          ),
-                          const Text('End Node'),
-                        ],
-                      ),
-                      Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        spacing: 10,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.blueAccent,
-                                width: 1,
-                              ),
-                              color: Colors.black,
-                            ),
-                            height: 30,
-                            width: 30,
-                          ),
-                          const Text('Wall'),
-                        ],
-                      ),
-                      Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        spacing: 10,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.blueAccent,
-                                width: 1,
-                              ),
-                              color: Colors.blue,
-                            ),
-                            height: 30,
-                            width: 30,
-                          ),
-                          const Text('Visited'),
-                        ],
-                      ),
-                      Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        spacing: 10,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.blueAccent,
-                                width: 1,
-                              ),
-                              color: Colors.white,
-                            ),
-                            height: 30,
-                            width: 30,
-                          ),
-                          const Text('Non Visited'),
-                        ],
-                      ),
-                      Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        spacing: 10,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.blueAccent,
-                                width: 1,
-                              ),
-                              color: Colors.yellow,
-                            ),
-                            height: 30,
-                            width: 30,
-                          ),
-                          Text('Shortest Path'),
-                        ],
-                      ),
+                      for (NodeDescription node in nodeDescriptions) ...[
+                        node,
+                      ]
                     ],
                   ),
                 ),
@@ -451,12 +398,12 @@ class _PathVisualizerState extends State<PathVisualizer> {
                       ),
                     ],
                   ],
-                )
+                ),
               ],
             ),
           ),
         ],
-      )
+      ),
     );
   }
 }

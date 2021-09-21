@@ -47,14 +47,15 @@ class NodeState extends State<Node> {
 
   @override
   Widget build(BuildContext context) {
+    print('rebuild');
     return Container(
-      height: 30,
-      width: 30,
+      height: 25,
+      width: 25,
       decoration: BoxDecoration(
         color: nodeColor,
         border: Border.all(
           width: 1,
-          color: Colors.redAccent,
+          color: Colors.lightBlue,
         ),
       ),
     );
