@@ -1,27 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_path_visualizer/main.dart';
+import 'package:provider/provider.dart';
 import '../../path_visualizer.dart';
 
 class CustomAppBar extends StatelessWidget {
   const CustomAppBar({
     Key key,
-    this.curAlgorithm,
-    this.curBrush,
-    this.onBrushChange,
-    this.onAlgorithmChange,
-    this.onSpeedChange,
     this.resetGrid,
     this.resetAll,
     this.executeAlgorithm,
-    this.curSpeed,
   }) : super(key: key);
 
- 
-  final Brush curBrush;
-  final Speed curSpeed;
-  final Function onBrushChange;
-  final Algorithm curAlgorithm;
-  final Function onAlgorithmChange;
-  final Function onSpeedChange;
   final Function executeAlgorithm;
   final Function resetGrid;
   final Function resetAll;
@@ -61,25 +50,30 @@ class CustomAppBar extends StatelessWidget {
                           fontSize: 18,
                         ),
                       ),
-                      DropdownButton<Algorithm>(
-                        dropdownColor: Colors.blueAccent,
-                        style: const TextStyle(
-                          fontSize: 18,
-                        ),
-                        value: curAlgorithm,
-                        items: <Algorithm>[Algorithm.bfs, Algorithm.dfs].map((Algorithm value) {
-                          return DropdownMenuItem<Algorithm>(
-                            value: value,
-                            child: Text(
-                              algorithmMap[value],
-                              style: const TextStyle(
-                                color: Colors.white,
-                              ),
+                      Selector<PathNotifier, Algorithm>(
+                        selector: (_, state) => state.curAlgorithm,
+                        builder: (_, curAlgorithm, __) {
+                          return DropdownButton<Algorithm>(
+                            dropdownColor: Colors.blueAccent,
+                            style: const TextStyle(
+                              fontSize: 18,
                             ),
+                            value: curAlgorithm,
+                            items: <Algorithm>[Algorithm.bfs, Algorithm.dfs].map((Algorithm value) {
+                              return DropdownMenuItem<Algorithm>(
+                                value: value,
+                                child: Text(
+                                  algorithmMap[value],
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (_) {
+                              Provider.of<PathNotifier>(context, listen: false).changeAlgorithm(_);
+                            },
                           );
-                        }).toList(),
-                        onChanged: (_) {
-                          onAlgorithmChange(_);
                         },
                       ),
                     ],
@@ -104,7 +98,7 @@ class CustomAppBar extends StatelessWidget {
                       ),
                     ),
                     onTap: () {
-                      executeAlgorithm();
+                      executeAlgorithm(Provider.of<PathNotifier>(context, listen: false).curAlgorithm, Provider.of<PathNotifier>(context, listen: false).curSpeed);
                     },
                   ),
                   GestureDetector(
@@ -149,26 +143,31 @@ class CustomAppBar extends StatelessWidget {
                           fontSize: 18,
                         ),
                       ),
-                      DropdownButton<Speed>(
-                        dropdownColor: Colors.blueAccent,
-                        style: const TextStyle(
-                          fontSize: 18,
-                        ),
-                        value: curSpeed,
-                        items: <Speed>[Speed.fast, Speed.average, Speed.slow].map((Speed type) {
-                          return DropdownMenuItem<Speed>(
-                            value: type,
-                            child: Text(
-                              speedMap[type],
-                              style: const TextStyle(
-                                color: Colors.white,
-                              ),
+                      Selector<PathNotifier, Speed>(
+                        selector: (_, state) => state.curSpeed,
+                        builder: (_, curSpeed, __) {
+                          return DropdownButton<Speed>(
+                            dropdownColor: Colors.blueAccent,
+                            style: const TextStyle(
+                              fontSize: 18,
                             ),
+                            value: curSpeed,
+                            items: <Speed>[Speed.fast, Speed.average, Speed.slow].map((Speed type) {
+                              return DropdownMenuItem<Speed>(
+                                value: type,
+                                child: Text(
+                                  speedMap[type],
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (_) {
+                              Provider.of<PathNotifier>(context, listen: false).changeSpeed(_);
+                            },
                           );
-                        }).toList(),
-                        onChanged: (chosenSpeed) {
-                          onSpeedChange(chosenSpeed);
-                        },
+                        }
                       ),
                     ],
                   ),
@@ -184,25 +183,30 @@ class CustomAppBar extends StatelessWidget {
                           fontSize: 18,
                         ),
                       ),
-                      DropdownButton<Brush>(
-                        dropdownColor: Colors.blueAccent,
-                        style: const TextStyle(
-                          fontSize: 18,
-                        ),
-                        value: curBrush,
-                        items: <Brush>[Brush.start, Brush.end, Brush.wall].map((Brush type) {
-                          return DropdownMenuItem<Brush>(
-                            value: type,
-                            child: Text(
-                              brushMap[type],
-                              style: const TextStyle(
-                                color: Colors.white,
-                              ),
+                      Selector<PathNotifier, Brush>(
+                        selector: (_, state) => state.curBrush,
+                        builder: (_, curBrush, __) {
+                          return DropdownButton<Brush>(
+                            dropdownColor: Colors.blueAccent,
+                            style: const TextStyle(
+                              fontSize: 18,
                             ),
+                            value: curBrush,
+                            items: <Brush>[Brush.start, Brush.end, Brush.wall].map((Brush type) {
+                              return DropdownMenuItem<Brush>(
+                                value: type,
+                                child: Text(
+                                  brushMap[type],
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (_) {
+                              Provider.of<PathNotifier>(context, listen: false).changeBrush(_);
+                            },
                           );
-                        }).toList(),
-                        onChanged: (chosenBrush) {
-                          onBrushChange(chosenBrush);
                         },
                       ),
                     ],
