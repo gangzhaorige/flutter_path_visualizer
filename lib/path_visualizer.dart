@@ -7,8 +7,8 @@ import 'package:provider/provider.dart';
 
 import 'components/appbar/appbar.dart';
 import 'components/node/node.dart';
-import 'components/node/nodeModel.dart';
 import 'components/node/node_description.dart';
+import 'components/node/node_model.dart';
 
 Map<Brush, String> brushMap = const {
   Brush.end : 'End node',
