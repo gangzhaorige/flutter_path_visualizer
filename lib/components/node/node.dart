@@ -9,7 +9,7 @@ class Node extends StatelessWidget {
     return Selector<NodeModel, Color>(
       selector: (_, states) => states.nodeColor,
       builder: (_,nodeColor,__) {
-        return AnimatedContainer(
+        return Container(
           height: 30,
           width: 30,
           decoration: BoxDecoration(
@@ -18,13 +18,9 @@ class Node extends StatelessWidget {
               width: 1,
               color: ColorStyle.nodeBorder,
             ),
-          ), duration: Duration(
-            milliseconds: 400,
-          ),
-          curve: Curves.easeOutExpo,
+          ), 
         );
       },
-      
     ); 
   }
 }

@@ -66,6 +66,8 @@ class _PathVisualizerState extends State<PathVisualizer> {
   int totalRow = 60;
   int totalCol = 30;
 
+  bool isVisualizing = false;
+
   List<List<NodeModel>> nodesStatus = [];
 
   List<NodeDescription> nodeDescriptions = [
@@ -216,6 +218,9 @@ class _PathVisualizerState extends State<PathVisualizer> {
   }
 
   void paint(int row, int col, Brush curBrush) {
+    if(isVisualizing){
+      return;
+    }
     if (!isStartOrEnd(row, col)) {
       if (curBrush == Brush.wall) {
         if (nodesStatus[row][col].isWall) {
@@ -253,10 +258,15 @@ class _PathVisualizerState extends State<PathVisualizer> {
   }
 
   Future<int> visualizeAlgorithm(List<NodeModel> orderOfVisit, List<NodeModel> pathingOrder, Speed curSpeed) {
+    isVisualizing = true;
     for(int i = 0; i <= orderOfVisit.length; i++) {
       if(i == orderOfVisit.length) {
         Future.delayed(Duration(milliseconds: speedValue[curSpeed] * i)).then((value) {
           visualizeFromStartToEnd(pathingOrder, curSpeed);
+        });
+        Future.delayed(Duration(milliseconds: orderOfVisit.length * speedValue[curSpeed] + pathingOrder.length * speedValue[curSpeed])).then((value) {
+          print('here');
+          isVisualizing = false;
         });
         return Future.value(orderOfVisit.length * speedValue[curSpeed] + pathingOrder.length * speedValue[curSpeed]);
       }
@@ -266,6 +276,7 @@ class _PathVisualizerState extends State<PathVisualizer> {
         }
       });
     }
+   
     return Future.value(orderOfVisit.length * speedValue[curSpeed]);
   }
 
