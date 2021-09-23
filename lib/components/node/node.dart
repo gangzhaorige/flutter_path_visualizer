@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_path_visualizer/colorStyle.dart';
-import 'package:flutter_path_visualizer/components/node/nodeModel.dart';
+import 'package:flutter_path_visualizer/components/node/node_model.dart';
 import 'package:provider/provider.dart';
 
 class Node extends StatelessWidget {
