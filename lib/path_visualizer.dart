@@ -183,24 +183,23 @@ class _PathVisualizerState extends State<PathVisualizer> {
   List<NodeModel> dijkstra() {
     List<NodeModel> list = [];
     nodesStatus[startRow][startCol].distance = 0;
-    PriorityQueue<NodeModel> queue = PriorityQueue<NodeModel>((a, b) => a.distance + a.weight - b.distance - b.weight);
+    PriorityQueue<NodeModel> queue = PriorityQueue<NodeModel>((a, b) => a.distance - b.distance);
     queue.add(nodesStatus[startRow][startCol]);
     while(queue.isNotEmpty) {
       NodeModel curNode = queue.removeFirst();
-      if (curNode.isWall || curNode.visited) {
-        continue;
+      List<NodeModel> neighbors = getNeighbors(curNode.row, curNode.col);
+      for (NodeModel model in neighbors) {
+        if(!model.visited && !model.isWall && model.distance >  curNode.distance + model.weight + 1) {
+          model.prev = curNode;
+          model.distance = curNode.distance + model.weight + 1;
+          queue.add(model);
+        }
       }
       visitNode(curNode.row, curNode.col);
       list.add(curNode);
-      if (curNode.row == endRow && curNode.col == endCol) {
+      if(nodesStatus[endRow][endCol].visited) {
         return list;
       }
-      List<NodeModel> neighbors = getUnvisitedNeighbors(curNode.row, curNode.col);
-      for (NodeModel model in neighbors) {
-        model.prev = curNode;
-        model.distance = curNode.distance + curNode.weight + 1;
-        queue.add(model);
-      }  
     }
     return list;
   }
@@ -221,6 +220,18 @@ class _PathVisualizerState extends State<PathVisualizer> {
       int curRow = row + direction[0];
       int curCol = col + direction[1];
       if (!isOutOfBoard(curRow, curCol) && !nodesStatus[curRow][curCol].visited) {
+        list.add(nodesStatus[curRow][curCol]);
+      }
+    }
+    return list;
+  }
+
+  List<NodeModel> getNeighbors(int row, int col) {
+    List<NodeModel> list = [];
+    for (List<int> direction in directions) {
+      int curRow = row + direction[0];
+      int curCol = col + direction[1];
+      if (!isOutOfBoard(curRow, curCol)) {
         list.add(nodesStatus[curRow][curCol]);
       }
     }
@@ -279,7 +290,7 @@ class _PathVisualizerState extends State<PathVisualizer> {
         node.isWall = false;
         node.nodeColor = ColorStyle.notVisited;
         if (node.weight == 0) {
-          node.weight = 10;
+          node.weight = 5;
         } else {
           node.weight = 0;
         }
