@@ -11,7 +11,7 @@ class NodeModel extends ChangeNotifier {
     this.nodeColor = Colors.white,
     this.isWall = false,
     this.weight = 0,
-    this.distance = 0,
+    this.distance = 10000,
   });
 
   int row;

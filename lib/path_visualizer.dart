@@ -136,7 +136,7 @@ class _PathVisualizerState extends State<PathVisualizer> {
       int size = queue.length;
       for (int i = 0; i < size; i++) {
         NodeModel curNode = queue.removeFirst();
-        if (curNode.visited) {
+        if (curNode.isWall || curNode.visited) {
           continue;
         }
         visitNode(curNode.row, curNode.col);
@@ -144,12 +144,10 @@ class _PathVisualizerState extends State<PathVisualizer> {
         if (curNode.row == endRow && curNode.col == endCol) {
           return list;
         }
-        List<NodeModel> neighbors = getNeighbors(curNode.row, curNode.col);
+        List<NodeModel> neighbors = getUnvisitedNeighbors(curNode.row, curNode.col);
         for (NodeModel model in neighbors) {
-          if (!model.visited) {
-            model.prev = curNode;
-            queue.add(model);
-          }
+          model.prev = curNode;
+          queue.add(model);
         }
       }
     }
@@ -166,17 +164,18 @@ class _PathVisualizerState extends State<PathVisualizer> {
     if (nodesStatus[endRow][endCol].visited || curNode.visited) {
       return;
     }
+    if (curNode.isWall || curNode.visited) {
+      return;
+    }
     visitNode(curNode.row, curNode.col);
     list.add(curNode);
     if (curNode.row == endRow && curNode.col == endCol) {
       return;
     }
-    List<NodeModel> neighbors = getNeighbors(curNode.row, curNode.col);
+    List<NodeModel> neighbors = getUnvisitedNeighbors(curNode.row, curNode.col);
     for (NodeModel model in neighbors) {
-      if (!model.visited) {
-        model.prev = curNode;
-        dfsHelper(list, model);
-      }
+      model.prev = curNode;
+      dfsHelper(list, model);
     }
     return;
   }
@@ -187,26 +186,21 @@ class _PathVisualizerState extends State<PathVisualizer> {
     PriorityQueue<NodeModel> queue = PriorityQueue<NodeModel>((a, b) => a.distance + a.weight - b.distance - b.weight);
     queue.add(nodesStatus[startRow][startCol]);
     while(queue.isNotEmpty) {
-      int size = queue.length;
-      for (int i = 0; i < size; i++) {
-        NodeModel curNode = queue.removeFirst();
-        if (curNode.visited) {
-          continue;
-        }
-        visitNode(curNode.row, curNode.col);
-        list.add(curNode);
-        if (curNode.row == endRow && curNode.col == endCol) {
-          return list;
-        }
-        List<NodeModel> neighbors = getNeighbors(curNode.row, curNode.col);
-        for (NodeModel model in neighbors) {
-          if (!model.visited) {
-            model.prev = curNode;
-            model.distance = curNode.distance + 1;
-            queue.add(model);
-          }
-        }  
+      NodeModel curNode = queue.removeFirst();
+      if (curNode.isWall || curNode.visited) {
+        continue;
       }
+      visitNode(curNode.row, curNode.col);
+      list.add(curNode);
+      if (curNode.row == endRow && curNode.col == endCol) {
+        return list;
+      }
+      List<NodeModel> neighbors = getUnvisitedNeighbors(curNode.row, curNode.col);
+      for (NodeModel model in neighbors) {
+        model.prev = curNode;
+        model.distance = curNode.distance + curNode.weight + 1;
+        queue.add(model);
+      }  
     }
     return list;
   }
@@ -221,12 +215,12 @@ class _PathVisualizerState extends State<PathVisualizer> {
     return list;
   }
 
-  List<NodeModel> getNeighbors(int row, int col) {
+  List<NodeModel> getUnvisitedNeighbors(int row, int col) {
     List<NodeModel> list = [];
     for (List<int> direction in directions) {
       int curRow = row + direction[0];
       int curCol = col + direction[1];
-      if (!isOutOfBoard(curRow, curCol) && !nodesStatus[curRow][curCol].isWall) {
+      if (!isOutOfBoard(curRow, curCol) && !nodesStatus[curRow][curCol].visited) {
         list.add(nodesStatus[curRow][curCol]);
       }
     }
@@ -349,7 +343,7 @@ class _PathVisualizerState extends State<PathVisualizer> {
         if(isStartOrEnd(i, j) || curNode.isWall) {
           continue;
         }
-        curNode.distance = 0;
+        curNode.distance = 10000;
         curNode.nodeColor = ColorStyle.notVisited;
         curNode.notifyListeners();
         curNode.prev = null;
@@ -369,6 +363,7 @@ class _PathVisualizerState extends State<PathVisualizer> {
         nodesStatus[i][j].nodeColor = ColorStyle.notVisited;
         curNode.prev = null;
         curNode.weight = 0;
+        curNode.distance = 10000;
         curNode.notifyListeners();
       }
     }
