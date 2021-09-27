@@ -63,7 +63,7 @@ class CustomAppBar extends StatelessWidget {
                               return DropdownMenuItem<Algorithm>(
                                 value: value,
                                 child: Text(
-                                  algorithmMap[value],
+                                  algorithmMap[value][0],
                                   style: const TextStyle(
                                     color: Colors.white,
                                   ),

@@ -19,10 +19,11 @@ Map<Brush, String> brushMap = const {
   Brush.weight : 'Weight',
 };
 
-Map<Algorithm, String> algorithmMap = const {
-  Algorithm.bfs : 'Breath First Search',
-  Algorithm.dfs : 'Depth First Search',
-  Algorithm.dijkstra : 'Dijkstra',
+// [0] algorithm name, [1] description
+Map<Algorithm, List<String>> algorithmMap = const {
+  Algorithm.bfs : ['Breath First Search', 'Breath First Search is unweighted and guarantees the shortest path.'],
+  Algorithm.dfs : ['Depth First Search', 'Death First Search is unweighted and does not guarantee the shortest path'],
+  Algorithm.dijkstra : ['Dijkstra', 'Dijkstra Algorithm is weighted and guarantees the shortest path'],
 };
 
 Map<Speed, String> speedMap = const {
@@ -399,17 +400,38 @@ class _PathVisualizerState extends State<PathVisualizer> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
-                Container(
-                  alignment: Alignment.center,
-                  child: Wrap(
-                    alignment: WrapAlignment.center,
-                    spacing: 30,
-                    children: [
-                      for (NodeDescription node in nodeDescriptions) ...[
-                        node,
-                      ]
-                    ],
-                  ),
+                Column(
+                  children: [
+                    Container(
+                      alignment: Alignment.center,
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 30,
+                        children: [
+                          for (NodeDescription node in nodeDescriptions) ...[
+                            node,
+                          ]
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.only(top: 50),
+                      alignment: Alignment.center,
+                      child: Center(
+                        child: Selector<PathNotifier, Algorithm>(
+                          selector: (_, state) => state.curAlgorithm,
+                          builder: (_, data, __) {
+                            return Text(
+                              '${algorithmMap[data][1]}',
+                              style: TextStyle(
+                                fontSize: 20,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
