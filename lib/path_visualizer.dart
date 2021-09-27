@@ -13,14 +13,16 @@ import 'components/node/node_description.dart';
 import 'components/node/node_model.dart';
 
 Map<Brush, String> brushMap = const {
-  Brush.end : 'End node',
-  Brush.start : 'Start node',
-  Brush.wall : 'Wall node',
+  Brush.end : 'End',
+  Brush.start : 'Start',
+  Brush.wall : 'Wall',
+  Brush.weight : 'Weight',
 };
 
 Map<Algorithm, String> algorithmMap = const {
   Algorithm.bfs : 'Breath First Search',
   Algorithm.dfs : 'Depth First Search',
+  Algorithm.dijkstra : 'Dijkstra',
 };
 
 Map<Speed, String> speedMap = const {
@@ -30,7 +32,7 @@ Map<Speed, String> speedMap = const {
 };
 
 Map<Speed, int> speedValue = const {
-  Speed.fast : 5,
+  Speed.fast : 10,
   Speed.average : 15,
   Speed.slow : 25,
 };
@@ -39,11 +41,13 @@ enum Brush {
   wall,
   start,
   end,
+  weight,
 }
 
 enum Algorithm {
   dfs,
   bfs,
+  dijkstra,
 }
 
 enum Speed {
@@ -201,7 +205,7 @@ class _PathVisualizerState extends State<PathVisualizer> {
             model.distance = curNode.distance + 1;
             queue.add(model);
           }
-        }
+        }  
       }
     }
     return list;
@@ -245,7 +249,6 @@ class _PathVisualizerState extends State<PathVisualizer> {
   }
 
   void updateVisit(int row, int col, Color color) {
-    // nodesStatus[row][col].nodeColor = color;
     nodesStatus[row][col].changeColor(color);
   }
 
@@ -253,27 +256,40 @@ class _PathVisualizerState extends State<PathVisualizer> {
     if(isVisualizing){
       return;
     }
+    NodeModel node = nodesStatus[row][col];
     if (!isStartOrEnd(row, col)) {
       if (curBrush == Brush.wall) {
-        if (nodesStatus[row][col].isWall) {
+        if (node.isWall) {
           updateVisit(row, col, ColorStyle.notVisited);
-          nodesStatus[row][col].isWall = false;
+          node.isWall = false;
         } else {
+          node.weight = 0;
           updateVisit(row, col, ColorStyle.wall);
-          nodesStatus[row][col].isWall = true;
+          node.isWall = true;
         }
       } else if (curBrush == Brush.start && !isEnd(row, col)) {
-        nodesStatus[row][col].isWall = false;
+        node.isWall = false;
+        node.weight = 0;
         updateVisit(startRow, startCol, ColorStyle.notVisited);
         startRow = row;
         startCol = col;
         updateVisit(startRow, startCol, ColorStyle.start);
       } else if (curBrush == Brush.end && !isStart(row, col)) {
-        nodesStatus[row][col].isWall = false;
+        node.isWall = false;
+        node.weight = 0;
         updateVisit(endRow, endCol, ColorStyle.notVisited);
         endRow = row;
         endCol = col;
         updateVisit(endRow, endCol, ColorStyle.end);
+      } else if (curBrush == Brush.weight && !isStartOrEnd(row, col)) {
+        node.isWall = false;
+        node.nodeColor = ColorStyle.notVisited;
+        if (node.weight == 0) {
+          node.weight = 10;
+        } else {
+          node.weight = 0;
+        }
+        node.notifyListeners();
       }
     }
   }
@@ -282,8 +298,10 @@ class _PathVisualizerState extends State<PathVisualizer> {
     List<NodeModel> orderOfVisit;
     if (curAlgorithm == Algorithm.bfs) {
       orderOfVisit = bfs();
-    } else {
+    } else if (curAlgorithm == Algorithm.dfs){
       orderOfVisit = dfs();
+    } else {
+      orderOfVisit = dijkstra();
     }
     List<NodeModel> pathingOrder = getPathFromStartToEnd(nodesStatus[endRow][endCol]);
     visualizeAlgorithm(orderOfVisit, pathingOrder, curSpeed);
@@ -297,7 +315,6 @@ class _PathVisualizerState extends State<PathVisualizer> {
           visualizeFromStartToEnd(pathingOrder, curSpeed);
         });
         Future.delayed(Duration(milliseconds: orderOfVisit.length * speedValue[curSpeed] + pathingOrder.length * speedValue[curSpeed])).then((value) {
-          print('here');
           isVisualizing = false;
         });
         return Future.value(orderOfVisit.length * speedValue[curSpeed] + pathingOrder.length * speedValue[curSpeed]);
@@ -332,7 +349,8 @@ class _PathVisualizerState extends State<PathVisualizer> {
         if(isStartOrEnd(i, j) || curNode.isWall) {
           continue;
         }
-        nodesStatus[i][j].nodeColor = ColorStyle.notVisited;
+        curNode.distance = 0;
+        curNode.nodeColor = ColorStyle.notVisited;
         curNode.notifyListeners();
         curNode.prev = null;
       }
@@ -349,8 +367,9 @@ class _PathVisualizerState extends State<PathVisualizer> {
         }
         curNode.isWall = false;
         nodesStatus[i][j].nodeColor = ColorStyle.notVisited;
-        curNode.notifyListeners();
         curNode.prev = null;
+        curNode.weight = 0;
+        curNode.notifyListeners();
       }
     }
   }

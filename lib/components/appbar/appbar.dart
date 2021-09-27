@@ -59,7 +59,7 @@ class CustomAppBar extends StatelessWidget {
                               fontSize: 18,
                             ),
                             value: curAlgorithm,
-                            items: <Algorithm>[Algorithm.bfs, Algorithm.dfs].map((Algorithm value) {
+                            items: <Algorithm>[Algorithm.bfs, Algorithm.dfs, Algorithm.dijkstra].map((Algorithm value) {
                               return DropdownMenuItem<Algorithm>(
                                 value: value,
                                 child: Text(
@@ -177,7 +177,7 @@ class CustomAppBar extends StatelessWidget {
                     direction: Axis.horizontal,
                     children: [
                       const Text(
-                        'NodeType',
+                        'Paint Type',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 18,
@@ -192,7 +192,7 @@ class CustomAppBar extends StatelessWidget {
                               fontSize: 18,
                             ),
                             value: curBrush,
-                            items: <Brush>[Brush.start, Brush.end, Brush.wall].map((Brush type) {
+                            items: <Brush>[Brush.start, Brush.end, Brush.wall, Brush.weight].map((Brush type) {
                               return DropdownMenuItem<Brush>(
                                 value: type,
                                 child: Text(
