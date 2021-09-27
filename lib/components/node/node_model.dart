@@ -10,10 +10,14 @@ class NodeModel extends ChangeNotifier {
     this.visited = false,
     this.nodeColor = Colors.white,
     this.isWall = false,
+    this.weight = 0,
+    this.distance = 10000,
   });
 
   int row;
   int col;
+  int weight;
+  int distance;
   bool visited;
   bool isWall;
   NodeModel prev;

@@ -1,4 +1,6 @@
 import 'dart:collection';
+import 'dart:math';
+import 'package:collection/collection.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_path_visualizer/colorStyle.dart';
@@ -98,10 +100,10 @@ class _PathVisualizerState extends State<PathVisualizer> {
   ];
 
   List<List<int>> directions = [
+    [0, 1],
     [1, 0],
     [0, -1],
     [-1, 0],
-    [0, 1],
   ];
 
   @override
@@ -173,6 +175,36 @@ class _PathVisualizerState extends State<PathVisualizer> {
       }
     }
     return;
+  }
+
+  List<NodeModel> dijkstra() {
+    List<NodeModel> list = [];
+    nodesStatus[startRow][startCol].distance = 0;
+    PriorityQueue<NodeModel> queue = PriorityQueue<NodeModel>((a, b) => a.distance + a.weight - b.distance - b.weight);
+    queue.add(nodesStatus[startRow][startCol]);
+    while(queue.isNotEmpty) {
+      int size = queue.length;
+      for (int i = 0; i < size; i++) {
+        NodeModel curNode = queue.removeFirst();
+        if (curNode.visited) {
+          continue;
+        }
+        visitNode(curNode.row, curNode.col);
+        list.add(curNode);
+        if (curNode.row == endRow && curNode.col == endCol) {
+          return list;
+        }
+        List<NodeModel> neighbors = getNeighbors(curNode.row, curNode.col);
+        for (NodeModel model in neighbors) {
+          if (!model.visited) {
+            model.prev = curNode;
+            model.distance = curNode.distance + 1;
+            queue.add(model);
+          }
+        }
+      }
+    }
+    return list;
   }
 
   List<NodeModel> getPathFromStartToEnd(NodeModel endNode) {
