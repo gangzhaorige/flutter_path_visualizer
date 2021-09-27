@@ -194,13 +194,10 @@ class _PathVisualizerState extends State<PathVisualizer> {
           model.distance = curNode.distance + model.weight + 1;
           queue.add(model);
         }
-        if(model.row == endRow && model.col == endCol) {
-          return list;
-        }
       }
       visitNode(curNode.row, curNode.col);
       list.add(curNode);
-      if(curNode.row == endRow && curNode.col == endCol) {
+      if(nodesStatus[endRow][endCol].visited) {
         return list;
       }
     }
