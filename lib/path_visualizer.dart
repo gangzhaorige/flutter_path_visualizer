@@ -161,10 +161,7 @@ class _PathVisualizerState extends State<PathVisualizer> {
   }
 
   void dfsHelper(List<NodeModel> list, NodeModel curNode) {
-    if (nodesStatus[endRow][endCol].visited || curNode.visited) {
-      return;
-    }
-    if (curNode.isWall || curNode.visited) {
+    if (curNode.isWall || curNode.visited || nodesStatus[endRow][endCol].visited) {
       return;
     }
     visitNode(curNode.row, curNode.col);
@@ -174,8 +171,10 @@ class _PathVisualizerState extends State<PathVisualizer> {
     }
     List<NodeModel> neighbors = getUnvisitedNeighbors(curNode.row, curNode.col);
     for (NodeModel model in neighbors) {
-      model.prev = curNode;
-      dfsHelper(list, model);
+      if(!model.visited) {
+        model.prev = curNode;
+        dfsHelper(list, model);
+      }
     }
     return;
   }
