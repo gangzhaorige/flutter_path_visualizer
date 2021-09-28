@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_path_visualizer/colorStyle.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 
 class NodeDescription extends StatelessWidget {
   NodeDescription({
@@ -25,11 +26,14 @@ class NodeDescription extends StatelessWidget {
             ),
             color: color,
           ),
-          height: 30,
-          width: 30,
+          height: 2.1.h,
+          width: 2.1.h,
         ),
         Text(
           description,
+          style: TextStyle(
+            fontSize: 10.sp,
+          ),
         ),
       ],
     );

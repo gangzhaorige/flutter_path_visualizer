@@ -13,8 +13,8 @@ class Node extends StatelessWidget {
       selector: (_, states) => Tuple2(states.nodeColor, states.weight),
        builder: (_, data, __) {
         return Container(
-          height: 2.1.h,
-          width: 2.1.h,
+          height: 1.3.w,
+          width: 1.3.w,
           decoration: BoxDecoration(
             color: data.item1,
             border: Border.all(

@@ -18,15 +18,13 @@ class MyApp extends StatelessWidget {
     return ResponsiveSizer(
       builder: (context, orientation, deviceType) {
         return MaterialApp(
-          title: 'Flutter Demo',
+          title: 'Path Visualizer',
           theme: ThemeData(
             primarySwatch: Colors.blue,
           ),
-          home: StatsFl(
-            child: ChangeNotifierProvider(
-              create: (BuildContext context) => PathNotifier(),
-              child: const PathVisualizer()
-            ),
+          home: ChangeNotifierProvider(
+            create: (BuildContext context) => PathNotifier(),
+            child: const PathVisualizer()
           ),
         );
       }
