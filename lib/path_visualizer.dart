@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_path_visualizer/colorStyle.dart';
 import 'package:flutter_path_visualizer/main.dart';
 import 'package:provider/provider.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 
 import 'components/appbar/appbar.dart';
 import 'components/node/node.dart';
@@ -412,6 +413,7 @@ class _PathVisualizerState extends State<PathVisualizer> {
                 Column(
                   children: [
                     Container(
+                      width: 100.w,
                       alignment: Alignment.center,
                       child: Wrap(
                         alignment: WrapAlignment.center,
@@ -424,6 +426,7 @@ class _PathVisualizerState extends State<PathVisualizer> {
                       ),
                     ),
                     Container(
+                      width: 100.w,
                       padding: EdgeInsets.only(top: 50),
                       alignment: Alignment.center,
                       child: Center(
@@ -433,7 +436,7 @@ class _PathVisualizerState extends State<PathVisualizer> {
                             return Text(
                               '${algorithmMap[data][1]}',
                               style: TextStyle(
-                                fontSize: 20,
+                                fontSize: 14.sp,
                               ),
                             );
                           },

@@ -3,6 +3,7 @@ import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_path_visualizer/colorStyle.dart';
 import 'package:flutter_path_visualizer/components/node/node_model.dart';
 import 'package:provider/provider.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:tuple/tuple.dart';
 
 class Node extends StatelessWidget {
@@ -12,8 +13,8 @@ class Node extends StatelessWidget {
       selector: (_, states) => Tuple2(states.nodeColor, states.weight),
        builder: (_, data, __) {
         return Container(
-          height: 30,
-          width: 30,
+          height: 2.1.h,
+          width: 2.1.h,
           decoration: BoxDecoration(
             color: data.item1,
             border: Border.all(

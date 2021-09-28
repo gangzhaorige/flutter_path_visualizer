@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_path_visualizer/main.dart';
 import 'package:provider/provider.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../path_visualizer.dart';
 
 class CustomAppBar extends StatelessWidget {
@@ -24,11 +25,11 @@ class CustomAppBar extends StatelessWidget {
       color: Colors.blueAccent,
       child: Row(
         children: [
-          const Text(
+          Text(
             'Path Visualizer',
             style: TextStyle(
               color: Colors.white,
-              fontSize: 20,
+              fontSize: 10.sp,
             ),
           ),
           Expanded(
@@ -43,11 +44,11 @@ class CustomAppBar extends StatelessWidget {
                     crossAxisAlignment: WrapCrossAlignment.center,
                     direction: Axis.horizontal,
                     children: [
-                      const Text(
+                      Text(
                         'Algorithms',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: 10.sp,
                         ),
                       ),
                       Selector<PathNotifier, Algorithm>(
@@ -55,8 +56,8 @@ class CustomAppBar extends StatelessWidget {
                         builder: (_, curAlgorithm, __) {
                           return DropdownButton<Algorithm>(
                             dropdownColor: Colors.blueAccent,
-                            style: const TextStyle(
-                              fontSize: 18,
+                            style: TextStyle(
+                              fontSize: 10.sp,
                             ),
                             value: curAlgorithm,
                             items: <Algorithm>[Algorithm.bfs, Algorithm.dfs, Algorithm.dijkstra].map((Algorithm value) {
@@ -64,8 +65,9 @@ class CustomAppBar extends StatelessWidget {
                                 value: value,
                                 child: Text(
                                   algorithmMap[value][0],
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     color: Colors.white,
+                                    fontSize: 10.sp,
                                   ),
                                 ),
                               );
@@ -89,11 +91,11 @@ class CustomAppBar extends StatelessWidget {
                         color: Colors.blueAccent
                         // color: viewModel.isUpdating ? Colors.redAccent : null,
                       ),
-                      child: const Text(
+                      child: Text(
                         'Visualize!',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: 10.sp,
                         ),
                       ),
                     ),
@@ -104,11 +106,11 @@ class CustomAppBar extends StatelessWidget {
                   GestureDetector(
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: const Text(
+                      child: Text(
                         'Clear Board',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: 10.sp,
                         ),
                       ),
                     ),
@@ -119,11 +121,11 @@ class CustomAppBar extends StatelessWidget {
                   GestureDetector(
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: const Text(
+                      child: Text(
                         'Clear Path',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: 10.sp,
                         ),
                       ),
                     ),
@@ -136,11 +138,11 @@ class CustomAppBar extends StatelessWidget {
                     crossAxisAlignment: WrapCrossAlignment.center,
                     direction: Axis.horizontal,
                     children: [
-                      const Text(
+                      Text(
                         'Speed',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: 10.sp,
                         ),
                       ),
                       Selector<PathNotifier, Speed>(
@@ -148,8 +150,8 @@ class CustomAppBar extends StatelessWidget {
                         builder: (_, curSpeed, __) {
                           return DropdownButton<Speed>(
                             dropdownColor: Colors.blueAccent,
-                            style: const TextStyle(
-                              fontSize: 18,
+                            style: TextStyle(
+                              fontSize: 10.sp,
                             ),
                             value: curSpeed,
                             items: <Speed>[Speed.fast, Speed.average, Speed.slow].map((Speed type) {
@@ -176,11 +178,11 @@ class CustomAppBar extends StatelessWidget {
                     crossAxisAlignment: WrapCrossAlignment.center,
                     direction: Axis.horizontal,
                     children: [
-                      const Text(
+                      Text(
                         'Paint Type',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: 10.sp,
                         ),
                       ),
                       Selector<PathNotifier, Brush>(
@@ -188,8 +190,8 @@ class CustomAppBar extends StatelessWidget {
                         builder: (_, curBrush, __) {
                           return DropdownButton<Brush>(
                             dropdownColor: Colors.blueAccent,
-                            style: const TextStyle(
-                              fontSize: 18,
+                            style: TextStyle(
+                              fontSize: 10.sp,
                             ),
                             value: curBrush,
                             items: <Brush>[Brush.start, Brush.end, Brush.wall, Brush.weight].map((Brush type) {

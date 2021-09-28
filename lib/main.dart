@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:sizer/sizer.dart';
 import 'package:statsfl/statsfl.dart';
 
 import 'path_visualizer.dart';
@@ -13,17 +15,21 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: StatsFl(
-        child: ChangeNotifierProvider(
-          create: (BuildContext context) => PathNotifier(),
-          child: const PathVisualizer()
-        ),
-      ),
+    return ResponsiveSizer(
+      builder: (context, orientation, deviceType) {
+        return MaterialApp(
+          title: 'Flutter Demo',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+          ),
+          home: StatsFl(
+            child: ChangeNotifierProvider(
+              create: (BuildContext context) => PathNotifier(),
+              child: const PathVisualizer()
+            ),
+          ),
+        );
+      }
     );
   }
 }
