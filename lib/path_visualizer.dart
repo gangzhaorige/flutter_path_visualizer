@@ -1,5 +1,4 @@
 import 'dart:collection';
-import 'dart:math';
 import 'package:collection/collection.dart';
 
 import 'package:flutter/material.dart';
@@ -34,7 +33,7 @@ Map<Speed, String> speedMap = const {
 };
 
 Map<Speed, int> speedValue = const {
-  Speed.fast : 10,
+  Speed.fast : 5,
   Speed.average : 15,
   Speed.slow : 25,
 };
@@ -73,8 +72,6 @@ class _PathVisualizerState extends State<PathVisualizer> {
   int endCol = 19;
   int totalRow = 60;
   int totalCol = 30;
-
-  bool isVisualizing = false;
 
   List<List<NodeModel>> nodesStatus = [];
 
@@ -259,9 +256,6 @@ class _PathVisualizerState extends State<PathVisualizer> {
   }
 
   void paint(int row, int col, Brush curBrush) {
-    if(isVisualizing){
-      return;
-    }
     NodeModel node = nodesStatus[row][col];
     if (!isStartOrEnd(row, col)) {
       if (curBrush == Brush.wall) {
@@ -300,28 +294,30 @@ class _PathVisualizerState extends State<PathVisualizer> {
     }
   }
 
-  void executeAlgorithm(Algorithm curAlgorithm, Speed curSpeed) {
-    List<NodeModel> orderOfVisit;
-    if (curAlgorithm == Algorithm.bfs) {
-      orderOfVisit = bfs();
-    } else if (curAlgorithm == Algorithm.dfs){
-      orderOfVisit = dfs();
-    } else {
-      orderOfVisit = dijkstra();
-    }
-    List<NodeModel> pathingOrder = getPathFromStartToEnd(nodesStatus[endRow][endCol]);
-    visualizeAlgorithm(orderOfVisit, pathingOrder, curSpeed);
+  void executeAlgorithm(Algorithm curAlgorithm, Speed curSpeed, Function setVisualizing) {
+    resetGrid().then((value) => Future.delayed(Duration(milliseconds: 500)).then((value) {
+      List<NodeModel> orderOfVisit;
+      if (curAlgorithm == Algorithm.bfs) {
+        orderOfVisit = bfs();
+      } else if (curAlgorithm == Algorithm.dfs){
+        orderOfVisit = dfs();
+      } else {
+        orderOfVisit = dijkstra();
+      }
+      List<NodeModel> pathingOrder = getPathFromStartToEnd(nodesStatus[endRow][endCol]);
+      visualizeAlgorithm(orderOfVisit, pathingOrder, curSpeed, setVisualizing);
+    }));
   }
 
-  Future<int> visualizeAlgorithm(List<NodeModel> orderOfVisit, List<NodeModel> pathingOrder, Speed curSpeed) {
-    isVisualizing = true;
+  Future<int> visualizeAlgorithm(List<NodeModel> orderOfVisit, List<NodeModel> pathingOrder, Speed curSpeed, Function setVisualizing) {
+    setVisualizing(true);
     for(int i = 0; i <= orderOfVisit.length; i++) {
       if(i == orderOfVisit.length) {
         Future.delayed(Duration(milliseconds: speedValue[curSpeed] * i)).then((value) {
           visualizeFromStartToEnd(pathingOrder, curSpeed);
         });
         Future.delayed(Duration(milliseconds: orderOfVisit.length * speedValue[curSpeed] + pathingOrder.length * speedValue[curSpeed])).then((value) {
-          isVisualizing = false;
+          setVisualizing(false);
         });
         return Future.value(orderOfVisit.length * speedValue[curSpeed] + pathingOrder.length * speedValue[curSpeed]);
       }
@@ -456,7 +452,7 @@ class _PathVisualizerState extends State<PathVisualizer> {
                               builder: (context) {
                                 return MouseRegion(
                                   onEnter: (event) {
-                                    if(event.down) {
+                                    if(event.down && !Provider.of<PathNotifier>(context, listen: false).isVisualizing) {
                                       paint(curNode.row, curNode.col, Provider.of<PathNotifier>(context, listen: false).curBrush);
                                     }
                                   },
@@ -466,7 +462,9 @@ class _PathVisualizerState extends State<PathVisualizer> {
                                       child: Node()
                                     ),
                                     onTap: () {
-                                      paint(curNode.row, curNode.col, Provider.of<PathNotifier>(context, listen: false).curBrush);
+                                      if(!Provider.of<PathNotifier>(context, listen: false).isVisualizing){
+                                        paint(curNode.row, curNode.col, Provider.of<PathNotifier>(context, listen: false).curBrush);
+                                      }
                                     }
                                   ),
                                 );

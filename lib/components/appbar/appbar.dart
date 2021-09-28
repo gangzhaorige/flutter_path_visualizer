@@ -16,7 +16,6 @@ class CustomAppBar extends StatelessWidget {
   final Function resetGrid;
   final Function resetAll;
   
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -80,58 +79,60 @@ class CustomAppBar extends StatelessWidget {
                       ),
                     ],
                   ),
-                  GestureDetector(
-                    child: Container(
-                      padding: const EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          width: 1,
-                          color: Colors.white,
+                  Selector<PathNotifier, bool>(
+                    selector: (_, state) => state.isVisualizing,
+                    builder: (_, isVisualizing, __) {
+                      return TextButton(
+                        child: Text(
+                          'Visualize!',
+                          style: TextStyle(
+                            color: isVisualizing ? Colors.redAccent : Colors.white,
+                            fontSize: 10.sp,
+                          ),
                         ),
-                        color: Colors.blueAccent
-                        // color: viewModel.isUpdating ? Colors.redAccent : null,
-                      ),
-                      child: Text(
-                        'Visualize!',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 10.sp,
-                        ),
-                      ),
-                    ),
-                    onTap: () {
-                      executeAlgorithm(Provider.of<PathNotifier>(context, listen: false).curAlgorithm, Provider.of<PathNotifier>(context, listen: false).curSpeed);
-                    },
+                        onPressed: isVisualizing ? null : () async {
+                          executeAlgorithm(
+                            Provider.of<PathNotifier>(context, listen: false).curAlgorithm,
+                            Provider.of<PathNotifier>(context, listen: false).curSpeed,
+                            Provider.of<PathNotifier>(context, listen: false).setVisualizing,
+                          );
+                        },
+                      );
+                    }
                   ),
-                  GestureDetector(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: Text(
-                        'Clear Board',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 10.sp,
+                  Selector<PathNotifier, bool>(
+                    selector: (_, state) => state.isVisualizing,
+                    builder: (_, isVisualizing, __) {
+                      return TextButton(
+                        child: Text(
+                          'Clear Board',
+                          style: TextStyle(
+                            color: isVisualizing ? Colors.redAccent : Colors.white,
+                            fontSize: 10.sp,
+                          ),
                         ),
-                      ),
-                    ),
-                    onTap: () {
-                      resetAll();
-                    },
+                        onPressed: isVisualizing ? null : () {
+                          resetAll();
+                        },
+                      );
+                    }
                   ),
-                  GestureDetector(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: Text(
-                        'Clear Path',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 10.sp,
+                  Selector<PathNotifier, bool>(
+                    selector: (_, state) => state.isVisualizing,
+                    builder: (_, isVisualizing, __) {
+                      return TextButton(
+                        child: Text(
+                          'Clear Path',
+                          style: TextStyle(
+                            color: isVisualizing ? Colors.redAccent : Colors.white,
+                            fontSize: 10.sp,
+                          ),
                         ),
-                      ),
-                    ),
-                    onTap: () {
-                      resetGrid();
-                    },
+                        onPressed: isVisualizing ? null : () {
+                          resetGrid();
+                        },
+                      );
+                    }
                   ),
                   Wrap(
                     spacing: 5,

@@ -38,10 +38,12 @@ class PathNotifier extends ChangeNotifier {
   Brush _curBrush = Brush.wall;
   Algorithm _curAlgorithm = Algorithm.bfs;
   Speed _curSpeed = Speed.fast;
+  bool _isVisualizing = false;
 
   Brush get curBrush => _curBrush;
   Algorithm get curAlgorithm => _curAlgorithm;
   Speed get curSpeed => _curSpeed;
+  bool get isVisualizing => _isVisualizing;
 
   void changeBrush(Brush type){
     _curBrush = type;
@@ -53,6 +55,10 @@ class PathNotifier extends ChangeNotifier {
   }
   void changeSpeed(Speed type){
     _curSpeed = type;
+    notifyListeners();
+  }
+  void setVisualizing(bool type){
+    _isVisualizing = type;
     notifyListeners();
   }
 }

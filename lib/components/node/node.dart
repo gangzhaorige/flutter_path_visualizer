@@ -23,7 +23,7 @@ class Node extends StatelessWidget {
             ),
           ), 
           child: data.item2 != 0 ? Icon(
-            FontAwesome5Solid.weight_hanging,
+            Ionicons.md_lock,
             size: 1.5.h,
           ) : null,
         );
