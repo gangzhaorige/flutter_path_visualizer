@@ -436,7 +436,7 @@ class _PathVisualizerState extends State<PathVisualizer> {
                             return Text(
                               '${algorithmMap[data][1]}',
                               style: TextStyle(
-                                fontSize: 14.sp,
+                                fontSize: 10.sp,
                               ),
                             );
                           },

@@ -22,7 +22,10 @@ class Node extends StatelessWidget {
               color: ColorStyle.nodeBorder,
             ),
           ), 
-          child: data.item2 != 0 ? Icon(FontAwesome5Solid.weight_hanging) : null,
+          child: data.item2 != 0 ? Icon(
+            FontAwesome5Solid.weight_hanging,
+            size: 1.5.h,
+          ) : null,
         );
       },
     ); 
