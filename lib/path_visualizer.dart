@@ -188,17 +188,17 @@ class _PathVisualizerState extends State<PathVisualizer> {
     while(queue.isNotEmpty) {
       NodeModel curNode = queue.removeFirst();
       List<NodeModel> neighbors = getNeighbors(curNode.row, curNode.col);
+      visitNode(curNode.row, curNode.col);
+      list.add(curNode);
+      if(curNode.row == endRow && curNode.col == endCol) {
+        return list;
+      }
       for (NodeModel model in neighbors) {
-        if(!model.visited && !model.isWall && model.distance >  curNode.distance + model.weight + 1) {
+        if(!model.visited && !model.isWall && model.distance > curNode.distance + model.weight + 1) {
           model.prev = curNode;
           model.distance = curNode.distance + model.weight + 1;
           queue.add(model);
         }
-      }
-      visitNode(curNode.row, curNode.col);
-      list.add(curNode);
-      if(nodesStatus[endRow][endCol].visited) {
-        return list;
       }
     }
     return list;
@@ -351,11 +351,10 @@ class _PathVisualizerState extends State<PathVisualizer> {
       for (int j = 0; j < nodesStatus[0].length; j++) {
         NodeModel curNode = nodesStatus[i][j];
         unvisitNode(i, j);
-        if(isStartOrEnd(i, j) || curNode.isWall) {
-          continue;
+        if(!isStartOrEnd(i, j) && !curNode.isWall) {
+          curNode.nodeColor = ColorStyle.notVisited;
         }
         curNode.distance = 10000;
-        curNode.nodeColor = ColorStyle.notVisited;
         curNode.notifyListeners();
         curNode.prev = null;
       }
@@ -367,11 +366,10 @@ class _PathVisualizerState extends State<PathVisualizer> {
       for (int j = 0; j < nodesStatus[0].length; j++) {
         NodeModel curNode = nodesStatus[i][j];
         unvisitNode(i, j);
-        if(isStartOrEnd(i, j)) {
-          continue;
-        }
         curNode.isWall = false;
-        nodesStatus[i][j].nodeColor = ColorStyle.notVisited;
+        if(!isStartOrEnd(i, j)) {
+          nodesStatus[i][j].nodeColor = ColorStyle.notVisited;
+        }
         curNode.prev = null;
         curNode.weight = 0;
         curNode.distance = 10000;
