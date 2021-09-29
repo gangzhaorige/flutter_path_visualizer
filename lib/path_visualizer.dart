@@ -202,6 +202,42 @@ class _PathVisualizerState extends State<PathVisualizer> {
     return list;
   }
 
+  List<NodeModel> aStar() {
+    List<NodeModel> list = [];
+    NodeModel startNode = nodesStatus[startRow][startCol];
+    startNode.distance = 0;
+    PriorityQueue<NodeModel> queue = PriorityQueue<NodeModel>((a, b) => a.fn - b.fn);
+    queue.add(startNode);
+    while(queue.isNotEmpty) {
+      NodeModel curNode = queue.removeFirst();
+      if(curNode.visited) {
+        continue;
+      }
+      List<NodeModel> neighbors = getNeighbors(curNode.row, curNode.col);
+      visitNode(curNode.row, curNode.col);
+      list.add(curNode);
+      if(curNode.row == endRow && curNode.col == endCol) {
+        return list;
+      }
+      for (NodeModel model in neighbors) {
+        if(!model.visited) {
+          int cost = curNode.fn + heuristic_cost_estimate(curNode, model);
+          model.prev = curNode;
+          model.distance = curNode.distance + model.weight + 1;
+          model.fn = cost;
+          queue.add(model);
+        }
+      }
+    }
+    return list;
+  }
+
+  int heuristic_cost_estimate(NodeModel a, NodeModel b) {
+    int deltaX = (a.row - b.row).abs();
+    int deltaY = (a.col - b.col).abs();
+    return deltaX + deltaY;
+  }
+
   List<NodeModel> getPathFromStartToEnd(NodeModel endNode) {
     List<NodeModel> list = [];
     NodeModel cur = endNode;
@@ -302,7 +338,7 @@ class _PathVisualizerState extends State<PathVisualizer> {
       } else if (curAlgorithm == Algorithm.dfs){
         orderOfVisit = dfs();
       } else {
-        orderOfVisit = dijkstra();
+        orderOfVisit = aStar();
       }
       List<NodeModel> pathingOrder = getPathFromStartToEnd(nodesStatus[endRow][endCol]);
       visualizeAlgorithm(orderOfVisit, pathingOrder, curSpeed, setVisualizing);

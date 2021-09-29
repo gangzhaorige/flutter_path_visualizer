@@ -12,12 +12,16 @@ class NodeModel extends ChangeNotifier {
     this.isWall = false,
     this.weight = 0,
     this.distance = 10000,
+    this.heuristic = 0,
+    this.fn = 0,
   });
 
   int row;
   int col;
   int weight;
   int distance;
+  int heuristic;
+  int fn;
   bool visited;
   bool isWall;
   NodeModel prev;
