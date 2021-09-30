@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
           ),
           home: ChangeNotifierProvider(
             create: (BuildContext context) => PathNotifier(),
-            child: const PathVisualizer()
+            child: const PathVisualizer(),
           ),
         );
       }
@@ -37,11 +37,13 @@ class PathNotifier extends ChangeNotifier {
   Algorithm _curAlgorithm = Algorithm.bfs;
   Speed _curSpeed = Speed.fast;
   bool _isVisualizing = false;
+  Maze _curMaze = Maze.random;
 
   Brush get curBrush => _curBrush;
   Algorithm get curAlgorithm => _curAlgorithm;
   Speed get curSpeed => _curSpeed;
   bool get isVisualizing => _isVisualizing;
+  Maze get curMaze => _curMaze;
 
   void changeBrush(Brush type){
     _curBrush = type;
@@ -57,6 +59,10 @@ class PathNotifier extends ChangeNotifier {
   }
   void setVisualizing(bool type){
     _isVisualizing = type;
+    notifyListeners();
+  }
+  void setMaze(Maze type){
+    _curMaze = type;
     notifyListeners();
   }
 }

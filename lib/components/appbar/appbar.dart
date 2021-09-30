@@ -10,13 +10,14 @@ class CustomAppBar extends StatelessWidget {
     this.resetGrid,
     this.resetAll,
     this.executeAlgorithm,
-    this.randomWalls,
+    this.executeMaze,
   }) : super(key: key);
 
-  final Function executeAlgorithm;
   final Function resetGrid;
   final Function resetAll;
-  final Function randomWalls;
+  final Function executeAlgorithm;
+  final Function executeMaze;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -80,29 +81,55 @@ class CustomAppBar extends StatelessWidget {
                       ),
                     ],
                   ),
-                  DropdownButton<String>(
-                    dropdownColor: Colors.blueAccent,
-                    style: TextStyle(
-                      fontSize: 10.sp,
-                    ),
-                    value: 'Random Walls',
-                    items: ['Random Walls', 'Recursive Maze'].map((String type) {
-                      return DropdownMenuItem<String>(
-                        value: type,
-                        child: Text(
-                          type,
-                          style: const TextStyle(
-                            color: Colors.white,
-                          ),
+                  Selector<PathNotifier, Maze>(
+                    selector: (_, state) => state.curMaze,
+                    builder: (_, curMaze, __) {
+                      return DropdownButton<Maze>(
+                        dropdownColor: Colors.blueAccent,
+                        style: TextStyle(
+                          fontSize: 10.sp,
                         ),
-                        onTap: () {
-                          randomWalls();
+                        value: curMaze,
+                        items: [Maze.random, Maze.prim].map((Maze type) {
+                          return DropdownMenuItem<Maze>(
+                            value: type,
+                            child: Text(
+                              mazeMap[type],
+                              style: const TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
+                            onTap: () {
+                              print('maze');                              
+                            },
+                          );
+                        }).toList(),
+                        onChanged: (_) {
+                          Provider.of<PathNotifier>(context, listen: false).setMaze(_);
                         },
                       );
-                    }).toList(),
-                    onChanged: (_) {
-                      // do something
                     },
+                  ),
+                  Selector<PathNotifier, bool>(
+                    selector: (_, state) => state.isVisualizing,
+                    builder: (_, isVisualizing, __) {
+                      return TextButton(
+                        child: Text(
+                          'Generate Maze!',
+                          style: TextStyle(
+                            color: isVisualizing ? Colors.redAccent : Colors.white,
+                            fontSize: 10.sp,
+                          ),
+                        ),
+                        onPressed: isVisualizing ? null : () async {
+                          executeMaze(
+                            Provider.of<PathNotifier>(context, listen: false).curMaze,
+                            Provider.of<PathNotifier>(context, listen: false).curSpeed,
+                            Provider.of<PathNotifier>(context, listen: false).setVisualizing,
+                          );
+                        },
+                      );
+                    }
                   ),
                   Selector<PathNotifier, bool>(
                     selector: (_, state) => state.isVisualizing,

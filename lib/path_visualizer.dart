@@ -28,6 +28,11 @@ Map<Algorithm, List<String>> algorithmMap = const {
   Algorithm.aStar : ['A* Search', 'A* Algorithm is weighted and guarantees the shortest path'],
 };
 
+Map<Maze, String> mazeMap = const {
+  Maze.random : 'Random Maze',
+  Maze.prim : 'Prims\'s Maze',
+};
+
 Map<Speed, String> speedMap = const {
   Speed.fast : 'Fast',
   Speed.average : 'Average',
@@ -58,6 +63,11 @@ enum Speed {
   fast,
   average,
   slow,
+}
+
+enum Maze {
+  random,
+  prim,
 }
 
 class PathVisualizer extends StatefulWidget {
@@ -345,7 +355,7 @@ class _PathVisualizerState extends State<PathVisualizer> {
   }
 
   void executeAlgorithm(Algorithm curAlgorithm, Speed curSpeed, Function setVisualizing) {
-    resetGrid().then((value) => Future.delayed(Duration(milliseconds: 500)).then((value) {
+    resetGrid().then((value) => Future.delayed(Duration(milliseconds: 200)).then((value) {
       List<NodeModel> orderOfVisit;
       if (curAlgorithm == Algorithm.bfs) {
         orderOfVisit = bfs();
@@ -379,7 +389,6 @@ class _PathVisualizerState extends State<PathVisualizer> {
         }
       });
     }
-   
     return Future.value(orderOfVisit.length * speedValue[curSpeed]);
   }
 
@@ -442,21 +451,117 @@ class _PathVisualizerState extends State<PathVisualizer> {
     return i == endRow && j == endCol;
   }
 
-  void randomWalls() {
+  List<NodeModel> randomMaze() {
+    List<NodeModel> nodes = [];
     Random rng = new Random();
     for(int i = 0; i < nodesStatus.length; i++) {
       for(int j = 0; j < nodesStatus[0].length; j++) {
-        if(isStartOrEnd(i, j) || nodesStatus[i][j].weight > 0) {
+        if(isStartOrEnd(i, j)) {
           continue;
         }
         NodeModel node = nodesStatus[i][j];
         int random = rng.nextInt(5);
         if(random > 3) {
-          node.isWall = true;
-          node.changeColor(ColorStyle.wall);
+          nodes.add(node);
         }
       }
     }
+    shuffle(nodes);
+    return nodes;
+  }
+
+  List shuffle(List items) {
+    var random = new Random();
+    for (var i = items.length - 1; i > 0; i--) {
+      var n = random.nextInt(i + 1);
+      var temp = items[i];
+      items[i] = items[n];
+      items[n] = temp;
+    }
+    return items;
+  }
+
+  Future<int> visualizeMaze(List<NodeModel> orderOfVisit, Speed curSpeed, Function setVisualizing) {
+    setVisualizing(true);
+    for(int i = 0; i <= orderOfVisit.length; i++) {
+      if(i == orderOfVisit.length) {
+        Future.delayed(Duration(milliseconds: orderOfVisit.length * speedValue[curSpeed])).then((value) {
+          setVisualizing(false);
+        });
+        return Future.value(orderOfVisit.length * speedValue[curSpeed]);
+      }
+      Future.delayed(Duration(milliseconds: speedValue[curSpeed] * i)).then((value) {
+        if (!isStartOrEnd(orderOfVisit[i].row, orderOfVisit[i].col)) {
+          orderOfVisit[i].isWall = true;
+          updateVisit(orderOfVisit[i].row, orderOfVisit[i].col, ColorStyle.wall);
+        }
+      });
+    }
+    return Future.value(orderOfVisit.length * speedValue[curSpeed]);
+  }
+
+
+  List<NodeModel> primMaze() {
+    print('called');
+    int width = totalRow;
+    int height = totalCol;
+    List<NodeModel> list = [];
+    Random rng = Random();
+    int x = rng.nextInt(totalRow);
+    int y = rng.nextInt(totalCol);
+    while(isStartOrEnd(x, y)) {
+      x = rng.nextInt(endRow);
+      y = rng.nextInt(endCol);
+    }
+    List<List<int>> frontier = [];
+    frontier.add([x,y,x,y]);
+    while (frontier.isNotEmpty){
+      List<int> f = frontier.removeAt(rng.nextInt(frontier.length));
+      x = f[2];
+      y = f[3];
+      if (!nodesStatus[x][y].visited && !isStartOrEnd(x, y)) {
+        nodesStatus[f[0]][f[1]].visited = nodesStatus[x][y].visited= true;
+        list.add(nodesStatus[f[0]][f[1]]);
+        list.add(nodesStatus[x][y]);
+        if (x >= 2 && !nodesStatus[x-2][y].visited) {
+          frontier.add([x-1,y,x-2,y]);
+        }
+        if (y >= 2 && !nodesStatus[x][y-2].visited) {
+          frontier.add([x,y-1,x,y-2]);
+        }
+        if (x < width-2 && !nodesStatus[x+2][y].visited) {
+          frontier.add([x+1,y,x+2,y]);
+        }
+        if (y < height-2 && !nodesStatus[x][y+2].visited) {
+          frontier.add([x,y+1,x,y+2]);
+        }
+      }
+    }
+    return list;
+  }
+
+  // List<NodeModel> recursiveMaze() {
+  //   List<NodeModel> list = [];
+  //   // buildRecursive(list);
+  //   return list;
+  // }
+
+  // void buildRecursive(List<NodeModel> list, int width, int height, int xOffSet, int yOffSet) {
+  //   if(width < 2 || height < 2) {
+  //     return;
+  //   }
+  // }
+
+  void executeMaze(Maze curMaze, Speed curSpeed, Function setVisualizing) {
+    resetAll().then((value) => Future.delayed(Duration(milliseconds: 500)).then((value) {
+      List<NodeModel> orderOfRender;
+      if (curMaze == Maze.random) {
+        orderOfRender = randomMaze();
+      } else {
+        orderOfRender = primMaze();
+      } 
+      visualizeMaze(orderOfRender, curSpeed, setVisualizing);
+    }));
   }
   
   @override
@@ -470,7 +575,7 @@ class _PathVisualizerState extends State<PathVisualizer> {
             resetAll: resetAll,
             resetGrid: resetGrid,
             executeAlgorithm: executeAlgorithm,
-            randomWalls: randomWalls,
+            executeMaze: executeMaze,
           ),
           Expanded(
             child: Column(
