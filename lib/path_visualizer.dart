@@ -23,7 +23,8 @@ Map<Brush, String> brushMap = const {
 Map<Algorithm, List<String>> algorithmMap = const {
   Algorithm.bfs : ['Breath First Search', 'Breath First Search is unweighted and guarantees the shortest path.'],
   Algorithm.dfs : ['Depth First Search', 'Death First Search is unweighted and does not guarantee the shortest path'],
-  Algorithm.dijkstra : ['Dijkstra', 'Dijkstra Algorithm is weighted and guarantees the shortest path'],
+  Algorithm.dijkstra : ['Dijkstra Search', 'Dijkstra Algorithm is weighted and guarantees the shortest path'],
+  Algorithm.aStar : ['A* Search', 'A* Algorithm is weighted and guarantees the shortest path'],
 };
 
 Map<Speed, String> speedMap = const {
@@ -34,8 +35,8 @@ Map<Speed, String> speedMap = const {
 
 Map<Speed, int> speedValue = const {
   Speed.fast : 5,
-  Speed.average : 15,
-  Speed.slow : 25,
+  Speed.average : 20,
+  Speed.slow : 35,
 };
 
 enum Brush {
@@ -49,6 +50,7 @@ enum Algorithm {
   dfs,
   bfs,
   dijkstra,
+  aStar,
 }
 
 enum Speed {
@@ -203,33 +205,44 @@ class _PathVisualizerState extends State<PathVisualizer> {
   }
 
   List<NodeModel> aStar() {
-    List<NodeModel> list = [];
+    List<NodeModel> open = [];
+    List<NodeModel> order = [];
+    Set<NodeModel> closed = new Set();
     NodeModel startNode = nodesStatus[startRow][startCol];
     startNode.distance = 0;
-    PriorityQueue<NodeModel> queue = PriorityQueue<NodeModel>((a, b) => a.fn - b.fn);
-    queue.add(startNode);
-    while(queue.isNotEmpty) {
-      NodeModel curNode = queue.removeFirst();
-      if(curNode.visited) {
-        continue;
+    startNode.fn = 0;
+    open.add(startNode);
+    while(open.isNotEmpty) {
+      open.sort();
+      NodeModel cur = open.removeAt(0);
+      closed.add(cur);
+      order.add(cur);
+      if(cur.row == endRow && cur.col == endCol) {
+        return order;
       }
-      List<NodeModel> neighbors = getNeighbors(curNode.row, curNode.col);
-      visitNode(curNode.row, curNode.col);
-      list.add(curNode);
-      if(curNode.row == endRow && curNode.col == endCol) {
-        return list;
-      }
-      for (NodeModel model in neighbors) {
-        if(!model.visited) {
-          int cost = curNode.fn + heuristic_cost_estimate(curNode, model);
-          model.prev = curNode;
-          model.distance = curNode.distance + model.weight + 1;
-          model.fn = cost;
-          queue.add(model);
+      List<NodeModel> neighbors = getNeighbors(cur.row, cur.col);
+      for(NodeModel neighbor in neighbors) {
+        if(neighbor.isWall) {
+          continue;
+        }
+        if(closed.contains(neighbor)) {
+          continue;
+        }
+        int gCost = cur.distance + neighbor.weight + 1;
+        int heuristic = heuristic_cost_estimate(neighbor, nodesStatus[endRow][endCol]);
+        int fn = gCost + heuristic;
+        if(neighbor.distance < gCost || !open.contains(neighbor)) {
+          neighbor.distance = gCost;
+          neighbor.heuristic = heuristic;
+          neighbor.fn = fn;
+          neighbor.prev = cur;
+          if(!open.contains(neighbor)) {
+            open.add(neighbor);
+          }
         }
       }
     }
-    return list;
+    return order;
   }
 
   int heuristic_cost_estimate(NodeModel a, NodeModel b) {
@@ -335,8 +348,10 @@ class _PathVisualizerState extends State<PathVisualizer> {
       List<NodeModel> orderOfVisit;
       if (curAlgorithm == Algorithm.bfs) {
         orderOfVisit = bfs();
-      } else if (curAlgorithm == Algorithm.dfs){
+      } else if (curAlgorithm == Algorithm.dfs) {
         orderOfVisit = dfs();
+      } else if (curAlgorithm == Algorithm.dijkstra) { 
+        orderOfVisit = dijkstra();
       } else {
         orderOfVisit = aStar();
       }

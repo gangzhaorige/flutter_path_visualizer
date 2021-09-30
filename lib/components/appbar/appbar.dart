@@ -59,7 +59,7 @@ class CustomAppBar extends StatelessWidget {
                               fontSize: 10.sp,
                             ),
                             value: curAlgorithm,
-                            items: <Algorithm>[Algorithm.bfs, Algorithm.dfs, Algorithm.dijkstra].map((Algorithm value) {
+                            items: <Algorithm>[Algorithm.bfs, Algorithm.dfs, Algorithm.dijkstra, Algorithm.aStar].map((Algorithm value) {
                               return DropdownMenuItem<Algorithm>(
                                 value: value,
                                 child: Text(

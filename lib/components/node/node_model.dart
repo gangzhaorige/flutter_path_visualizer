@@ -2,7 +2,7 @@ import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_path_visualizer/colorStyle.dart';
 
-class NodeModel extends ChangeNotifier {
+class NodeModel extends ChangeNotifier implements Comparable{
   NodeModel({
     Key key,
     this.row,
@@ -11,7 +11,7 @@ class NodeModel extends ChangeNotifier {
     this.nodeColor = Colors.white,
     this.isWall = false,
     this.weight = 0,
-    this.distance = 10000,
+    this.distance = 0,
     this.heuristic = 0,
     this.fn = 0,
   });
@@ -30,5 +30,16 @@ class NodeModel extends ChangeNotifier {
   void changeColor(Color color) {
     nodeColor = color;
     notifyListeners();
+  }
+
+  @override
+  int compareTo(other) {
+    if(this.fn > other.fn) {
+      return 1;
+    } else if(this.fn < other.fn) {
+      return -1;
+    } else {
+      return other.heuristic - this.heuristic;
+    }
   }
 }
