@@ -9,25 +9,27 @@ import 'package:tuple/tuple.dart';
 class Node extends StatelessWidget {
 
   Widget build(BuildContext buildContext) {
-    return Selector<NodeModel, Tuple2<Color, int>>(
-      selector: (_, states) => Tuple2(states.nodeColor, states.weight),
-       builder: (_, data, __) {
-        return Container(
-          height: 1.3.w,
-          width: 1.3.w,
-          decoration: BoxDecoration(
-            color: data.item1,
-            border: Border.all(
-              width: 1,
-              color: ColorStyle.nodeBorder,
-            ),
-          ), 
-          child: data.item2 != 0 ? Icon(
-            Ionicons.md_lock,
-            size: 1.5.h,
-          ) : null,
-        );
-      },
+    return SizedBox(
+      width: 1.3.w,
+      height: 1.3.w,
+      child: Selector<NodeModel, Tuple2<Color, int>>(
+        selector: (_, states) => Tuple2(states.nodeColor, states.weight),
+         builder: (_, data, __) {
+          return DecoratedBox(
+            decoration: BoxDecoration(
+              color: data.item1,
+              border: Border.all(
+                width: 1,
+                color: ColorStyle.nodeBorder,
+              ),
+            ), 
+            child: data.item2 != 0 ? Icon(
+              Ionicons.md_lock,
+              size: 1.2.w,
+            ) : null,
+          );
+        },
+      ),
     ); 
   }
 }
