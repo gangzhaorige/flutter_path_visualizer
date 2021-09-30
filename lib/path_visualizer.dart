@@ -401,7 +401,7 @@ class _PathVisualizerState extends State<PathVisualizer> {
         NodeModel curNode = nodesStatus[i][j];
         unvisitNode(i, j);
         if(!isStartOrEnd(i, j) && !curNode.isWall) {
-          curNode.nodeColor = ColorStyle.notVisited;
+          curNode.nodeColor = null;
         }
         curNode.distance = 10000;
         curNode.notifyListeners();
@@ -417,7 +417,7 @@ class _PathVisualizerState extends State<PathVisualizer> {
         unvisitNode(i, j);
         curNode.isWall = false;
         if(!isStartOrEnd(i, j)) {
-          nodesStatus[i][j].nodeColor = ColorStyle.notVisited;
+          nodesStatus[i][j].nodeColor = null;
         }
         curNode.prev = null;
         curNode.weight = 0;
@@ -443,17 +443,17 @@ class _PathVisualizerState extends State<PathVisualizer> {
   }
 
   void randomWalls() {
-    print('called');
     Random rng = new Random();
     for(int i = 0; i < nodesStatus.length; i++) {
       for(int j = 0; j < nodesStatus[0].length; j++) {
-        if(!isStartOrEnd(i, j)) {
-          NodeModel node = nodesStatus[i][j];
-          int random = rng.nextInt(5);
-          if(random > 3) {
-            node.isWall = true;
-            node.changeColor(ColorStyle.wall);
-          }
+        if(isStartOrEnd(i, j) || nodesStatus[i][j].weight > 0) {
+          continue;
+        }
+        NodeModel node = nodesStatus[i][j];
+        int random = rng.nextInt(5);
+        if(random > 3) {
+          node.isWall = true;
+          node.changeColor(ColorStyle.wall);
         }
       }
     }
@@ -471,10 +471,6 @@ class _PathVisualizerState extends State<PathVisualizer> {
             resetGrid: resetGrid,
             executeAlgorithm: executeAlgorithm,
             randomWalls: randomWalls,
-          ),
-          MaterialButton(
-            onPressed: randomWalls,
-            child: Text('PRess Me'),
           ),
           Expanded(
             child: Column(
@@ -522,27 +518,23 @@ class _PathVisualizerState extends State<PathVisualizer> {
                       Column(
                         children: [
                           for (NodeModel curNode in row) ... [
-                            Builder(
-                              builder: (context) {
-                                return MouseRegion(
-                                  onEnter: (event) {
-                                    if(event.down && !Provider.of<PathNotifier>(context, listen: false).isVisualizing) {
-                                      paint(curNode.row, curNode.col, Provider.of<PathNotifier>(context, listen: false).curBrush);
-                                    }
-                                  },
-                                  child: GestureDetector(
-                                    child: ChangeNotifierProvider.value(
-                                      value: curNode,
-                                      child: Node()
-                                    ),
-                                    onTap: () {
-                                      if(!Provider.of<PathNotifier>(context, listen: false).isVisualizing){
-                                        paint(curNode.row, curNode.col, Provider.of<PathNotifier>(context, listen: false).curBrush);
-                                      }
-                                    }
-                                  ),
-                                );
-                              }
+                            MouseRegion(
+                              onEnter: (event) {
+                                if(event.down && !Provider.of<PathNotifier>(context, listen: false).isVisualizing) {
+                                  paint(curNode.row, curNode.col, Provider.of<PathNotifier>(context, listen: false).curBrush);
+                                }
+                              },
+                              child: GestureDetector(
+                                child: ChangeNotifierProvider.value(
+                                  value: curNode,
+                                  child: Node()
+                                ),
+                                onTap: () {
+                                  if(!Provider.of<PathNotifier>(context, listen: false).isVisualizing){
+                                    paint(curNode.row, curNode.col, Provider.of<PathNotifier>(context, listen: false).curBrush);
+                                  }
+                                }
+                              ),
                             ),
                           ],
                         ],
