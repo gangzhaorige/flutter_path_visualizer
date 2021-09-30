@@ -10,12 +10,13 @@ class CustomAppBar extends StatelessWidget {
     this.resetGrid,
     this.resetAll,
     this.executeAlgorithm,
+    this.randomWalls,
   }) : super(key: key);
 
   final Function executeAlgorithm;
   final Function resetGrid;
   final Function resetAll;
-  
+  final Function randomWalls;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -78,6 +79,30 @@ class CustomAppBar extends StatelessWidget {
                         },
                       ),
                     ],
+                  ),
+                  DropdownButton<String>(
+                    dropdownColor: Colors.blueAccent,
+                    style: TextStyle(
+                      fontSize: 10.sp,
+                    ),
+                    value: 'Random Walls',
+                    items: ['Random Walls', 'Recursive Maze'].map((String type) {
+                      return DropdownMenuItem<String>(
+                        value: type,
+                        child: Text(
+                          type,
+                          style: const TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                        onTap: () {
+                          randomWalls();
+                        },
+                      );
+                    }).toList(),
+                    onChanged: (_) {
+                      // do something
+                    },
                   ),
                   Selector<PathNotifier, bool>(
                     selector: (_, state) => state.isVisualizing,

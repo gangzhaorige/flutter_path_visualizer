@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:math';
 import 'package:collection/collection.dart';
 
 import 'package:flutter/material.dart';
@@ -68,10 +69,10 @@ class PathVisualizer extends StatefulWidget {
 
 class _PathVisualizerState extends State<PathVisualizer> {
 
-  int startRow = 0;
-  int startCol = 0;
-  int endRow = 49;
-  int endCol = 19;
+  int startRow = 5;
+  int startCol = 15;
+  int endRow = 55;
+  int endCol = 15;
   int totalRow = 60;
   int totalCol = 30;
 
@@ -441,6 +442,23 @@ class _PathVisualizerState extends State<PathVisualizer> {
     return i == endRow && j == endCol;
   }
 
+  void randomWalls() {
+    print('called');
+    Random rng = new Random();
+    for(int i = 0; i < nodesStatus.length; i++) {
+      for(int j = 0; j < nodesStatus[0].length; j++) {
+        if(!isStartOrEnd(i, j)) {
+          NodeModel node = nodesStatus[i][j];
+          int random = rng.nextInt(5);
+          if(random > 3) {
+            node.isWall = true;
+            node.changeColor(ColorStyle.wall);
+          }
+        }
+      }
+    }
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -452,6 +470,11 @@ class _PathVisualizerState extends State<PathVisualizer> {
             resetAll: resetAll,
             resetGrid: resetGrid,
             executeAlgorithm: executeAlgorithm,
+            randomWalls: randomWalls,
+          ),
+          MaterialButton(
+            onPressed: randomWalls,
+            child: Text('PRess Me'),
           ),
           Expanded(
             child: Column(
